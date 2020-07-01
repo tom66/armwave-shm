@@ -59,6 +59,8 @@ int main (int argc, char* argv[]) {
   unsigned long		mask;
   XEvent		event;
   GC			gc;
+  
+  int           num = 0;
 
   /** for shm */
   int 			shmem_flag = 0;
@@ -270,15 +272,17 @@ int main (int argc, char* argv[]) {
     exit (-1);
   }
   
-  for (i = 0; i < yuv_image->height; i++) {
-    for (j = 0; j < yuv_image->width; j++) {
-      yuv_image->data[yuv_image->width*i + j] = i*j;
-    }
-  }
-  
   printf("%d\n", yuv_image->data_size);
   
   while (1) {
+    for (i = 0; i < yuv_image->height; i++) {
+      for (j = 0; j < yuv_image->width; j++) {
+        yuv_image->data[yuv_image->width*i + j] = (i*j) + num;
+      }
+    }
+    
+    num += 1;
+  
     frames = secsa = secsb = 0;
     time(&secsa);
     while (frames < 200) {	
