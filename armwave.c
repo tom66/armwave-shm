@@ -647,7 +647,9 @@ int main()
     int width = 800, height = 600;
     int x, y;
     uint32_t ptr_offs;
-    
+    int screen, should_quit = 0;
+    int match;
+   
     d = XOpenDisplay(NULL);
 
     if(!d) {
