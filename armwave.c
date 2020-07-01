@@ -634,6 +634,22 @@ int mitshm_error_handler(Display *d, XErrorEvent *ev)
     return 0;
 }
 
+void paint_buffer(XImage *img, int width, int height, int offs)
+{
+    for(y = 0; y < height; y++) {
+        //printf("armwave: paint at row %d, stride %d\n", y, img->bytes_per_line);
+        ptr_offs = y * img->bytes_per_line;
+        
+        for(x = 0; x < width; x++) {
+            *(img->data + ptr_offs + 0) = 0xff;
+            *(img->data + ptr_offs + 1) = x + offs;
+            *(img->data + ptr_offs + 2) = y + offs;
+            *(img->data + ptr_offs + 3) = x + y + offs;
+            ptr_offs += 4;
+        }
+    }
+}
+
 int main()
 {
     int mitshm_major_code;
@@ -653,6 +669,8 @@ int main()
     int screen, should_quit = 0;
     int match;
     int shared_pixmaps; // unused
+    
+    int offs = 0;
    
     d = XOpenDisplay(NULL);
 
@@ -724,20 +742,9 @@ int main()
         printf("armwave: error, MIT-SHM might not be supported?\n");
     }
 
-    printf("armwave: start to paint buffer %d * %d\n", width, height);
+    //printf("armwave: start to paint buffer %d * %d\n", width, height);
     
-    for(y = 0; y < height; y++) {
-        printf("armwave: paint at row %d, stride %d\n", y, img->bytes_per_line);
-        ptr_offs = y * img->bytes_per_line;
-        
-        for(x = 0; x < width; x++) {
-            *(img->data + ptr_offs + 0) = 0xff;
-            *(img->data + ptr_offs + 1) = x;
-            *(img->data + ptr_offs + 2) = y;
-            *(img->data + ptr_offs + 3) = x + y;
-            ptr_offs += 4;
-        }
-    }
+    paint_buffer(img, width, height, offs);
 
     win = XCreateSimpleWindow(d, DefaultRootWindow(d),
                              0, 0, width, height, 0,
@@ -757,6 +764,7 @@ int main()
                 break;
             
             case Expose:
+                paint_buffer(img, width, height, offs);
                 XShmPutImage(d, win, gc, img,
                     0,0,
                     0,0,
