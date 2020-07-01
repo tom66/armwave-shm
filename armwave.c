@@ -760,7 +760,7 @@ int main()
     printf("Click to terminate\r\n");
 
     while(!should_quit) {
-        XClearArea(d, win, 0, 0, 0, 0, True);
+        XClearArea(d, win, 0, 0, 1, 1, True);
         XNextEvent(d, &ev);
         
         switch(ev.type) {
