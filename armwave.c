@@ -638,6 +638,8 @@ void paint_buffer(XImage *img, int width, int height, int offs)
 {
     int x, y, ptr_offs;
     
+    printf("paint_buffer(%d)\r\n", offs);
+
     for(y = 0; y < height; y++) {
         //printf("armwave: paint at row %d, stride %d\n", y, img->bytes_per_line);
         ptr_offs = y * img->bytes_per_line;
@@ -766,12 +768,8 @@ int main()
                 break;
             
             case Expose:
-                paint_buffer(img, width, height, offs);
-                XShmPutImage(d, win, gc, img,
-                    0,0,
-                    0,0,
-                    width, height,
-                    True);
+                paint_buffer(img, width, height, offs++);
+                XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
                 break;
         }
     }
