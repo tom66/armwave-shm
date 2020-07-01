@@ -760,7 +760,7 @@ int main()
     printf("Click to terminate\r\n");
 
     while(!should_quit) {
-        XClearArea(d, win, 0, 0, 20, 20, True);
+        XClearArea(d, win, 0, 0, 0, 0, True);
         XNextEvent(d, &ev);
         
         switch(ev.type) {
@@ -775,8 +775,8 @@ int main()
         }
     }
    
-	XShmDetach(d, &shminfo); /* Server detached */
-	XDestroyImage (img);	 /* Image struct freed */
+	XShmDetach(d, &shminfo);
+	XDestroyImage(img);	
     shmdt(shminfo.shmaddr);
     
     XDestroyWindow(d, win);
