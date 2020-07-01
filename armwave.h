@@ -6,7 +6,7 @@
  * processor to render waveforms damn quickly.
  */
 
-#ifdef NO_PYTHON
+#ifndef NO_PYTHON
 #include <Python.h>
 #endif
 
@@ -105,7 +105,7 @@ void armwave_clear_buffer(uint32_t flags);
 //void armwave_fill_pixbuf_256(uint32_t *out_buffer);
 void armwave_fill_pixbuf_scaled(uint32_t *out_buffer);
 
-#ifdef NO_PYTHON
+#ifndef NO_PYTHON
 PyObject *armwave_fill_pixbuf_into_pybuffer(PyObject *buf_obj);
 #endif
 
