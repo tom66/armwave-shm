@@ -6,7 +6,9 @@
  * processor to render waveforms damn quickly.
  */
 
+#ifdef NO_PYTHON
 #include <Python.h>
+#endif
 
 #define AM_FLAG_RENDER_1CH_MODE     0x00000001
 #define AM_FLAG_RENDER_2CH_MODE     0x00000002
@@ -102,7 +104,11 @@ void armwave_set_channel_colour(int ch, int r, int g, int b);
 void armwave_clear_buffer(uint32_t flags);
 //void armwave_fill_pixbuf_256(uint32_t *out_buffer);
 void armwave_fill_pixbuf_scaled(uint32_t *out_buffer);
+
+#ifdef NO_PYTHON
 PyObject *armwave_fill_pixbuf_into_pybuffer(PyObject *buf_obj);
+#endif
+
 void armwave_dump_ppm_debug(uint32_t *buffer, char *fn);
 
 //void armwave_test_create_square(float noise_fraction);
