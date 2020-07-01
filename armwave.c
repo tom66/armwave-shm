@@ -627,10 +627,11 @@ void armwave_cleanup()
  * http://www6.uniovi.es/cscene/CS8/xlib-4.c
  */
 #ifdef NO_PYTHON
-void mitshm_error_handler(Display *d, XErrorEvent *ev) 
+int mitshm_error_handler(Display *d, XErrorEvent *ev) 
 {
     printf("Error: X11: MIT-SHM error (0x%08x, 0x%08x) - fatal\n", d, ev);
     exit(-1);
+    return 0;
 }
 
 int main()
@@ -643,12 +644,15 @@ int main()
     XShmSegmentInfo shminfo;
     XImage *img=NULL;
     XEvent ev;
+    Window win;
+    
     int (*handler)(Display *, XErrorEvent *);
     int width = 800, height = 600;
     int x, y;
     uint32_t ptr_offs;
     int screen, should_quit = 0;
     int match;
+    int shared_pixmaps; // unused
    
     d = XOpenDisplay(NULL);
 
