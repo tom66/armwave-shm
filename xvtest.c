@@ -232,14 +232,14 @@ int main (int argc, char* argv[]) {
       printf(" attribute list for port %d\n", p);
       at = XvQueryPortAttributes(dpy, p, &attributes);
       for (j = 0; j < attributes; j++) {
-	printf("  name:       %s\n"
-	       "  flags:     %s%s\n"
-	       "  min_color:  %i\n"
-	       "  max_color:  %i\n",
-	       at[j].name,
-	       (at[j].flags & XvGettable) ? " get" : "",
-	       (at[j].flags & XvSettable) ? " set" : "",						
-	       at[j].min_value, at[j].max_value);
+        printf("  name:       %s\n"
+               "  flags:     %s%s\n"
+               "  min_color:  %i\n"
+               "  max_color:  %i\n",
+               at[j].name,
+               (at[j].flags & XvGettable) ? " get" : "",
+               (at[j].flags & XvSettable) ? " set" : "",						
+               at[j].min_value, at[j].max_value);
       }
       if (at)
 	XFree(at);
@@ -254,9 +254,10 @@ int main (int argc, char* argv[]) {
                (fo[j].format == XvPacked) ? "packed" : "planar");
         */
         
-        printf("4CC: 0x%08x,  type: %d,  byte_order: %d,  bits_per_pixel: %d,  format: %d,  num_planes: %d,  depth: %d, pack:  %s\n", \
-            fo[j].id, fo[j].type, fo[j].byte_order, fo[j].bits_per_pixel, fo[j].format, fo[j].num_planes, fo[j].depth, 
-            (fo[j].format == XvPacked) ? "packed" : "planar");
+        printf("    4CC: 0x%08x,  type: %d,  byte_order: %d,  bits_per_pixel: %d,  format: %d,  num_planes: %d,  depth: %d, pack:  %s,  order: %s,  ybits: %d,  ubits: %d,  vbits: %d\n", \
+            fo[j].id, fo[j].type, fo[j].byte_order, fo[j].bits_per_pixel, fo[j].format, fo[j].num_planes, fo[j].depth,  \
+            (fo[j].format == XvPacked) ? "packed" : "planar", fo[j].component_order, \
+            fo[j].y_sample_bits, fo[j].u_sample_bits, fo[j].v_sample_bits);
       }
       if (fo)
 	XFree(fo);
