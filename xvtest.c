@@ -295,7 +295,7 @@ int main (int argc, char* argv[]) {
     while (frames < 200) {	
       for (i = 0; i < yuv_image->height; i++) {
         for (j = 0; j < yuv_image->width; j++) {
-          yuv_image->data[yuv_image->width*i + j] = num; // (i*j) + (num * 2);
+          yuv_image->data[yuv_image->width*i + j] = i + num; // (i*j) + (num * 2);
         }
       }
     
