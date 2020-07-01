@@ -707,12 +707,16 @@ int main()
             img = NULL;
         }
         */
+        printf("armwave: MIT-SHM initialised: %d.%d\n", mitshm_major_code, mitshm_minor_code);
     } else {
         printf("armwave: error, MIT-SHM might not be supported?\n");
     }
 
+    printf("armwave: start to paint buffer %d * %d\n", width, height);
+    
     for(y = 0; y < height; y++) {
         ptr_offs = height * img->bytes_per_line;
+        
         for(x = 0; x < width; x++) {
             *(img->data + ptr_offs + 0) = 0xff;
             *(img->data + ptr_offs + 1) = x;
