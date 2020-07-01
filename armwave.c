@@ -673,7 +673,7 @@ int main()
     printf("armwave: visual is type %d.\n", vis.class);
     
     if(vis.class != TrueColor) {
-        printf("armwave: error, colour class not supported (only TrueColor supported.)\n", vis.class;
+        printf("armwave: error, colour class not supported (only TrueColor supported.)\n", vis.class);
     }
     
     if(XShmQueryVersion(d, &mitshm_major_code, &mitshm_minor_code, &shared_pixmaps)) {
@@ -687,7 +687,7 @@ int main()
                                IPC_CREAT|0777);
         shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);
 
-        handler = XSetErrorHandler(x11_error_handler);
+        handler = XSetErrorHandler(mitshm_error_handler);
         XShmAttach(d, &shminfo); /* Tell the server to attach */
         XSync(d, 0);
         XSetErrorHandler(handler);
@@ -715,7 +715,7 @@ int main()
     }
 
     win = XCreateSimpleWindow(d, DefaultRootWindow(d),
-                             0, 0, WIN_W, WIN_H, 0,
+                             0, 0, width, height, 0,
                              WhitePixel(d, screen),
                              BlackPixel(d, screen));
     XSelectInput(d, win, ButtonPressMask|ExposureMask);
