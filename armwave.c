@@ -28,6 +28,7 @@
 #include <malloc.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
 
 #include "armwave.h"
 
@@ -773,6 +774,8 @@ int main()
                 XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
                 break;
         }
+        
+        usleep(16667);
     }
    
 	XShmDetach(d, &shminfo);
