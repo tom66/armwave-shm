@@ -763,6 +763,8 @@ int main()
     while(!should_quit) {
         XClearArea(d, win, 0, 0, 1, 1, True);
         XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
+        
+#if 0
         XNextEvent(d, &ev);
         
         switch(ev.type) {
@@ -777,6 +779,7 @@ int main()
                 break;
             */
         }
+#endif
         
         usleep(16667);
     }
