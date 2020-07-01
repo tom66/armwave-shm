@@ -66,8 +66,10 @@ int main (int argc, char* argv[]) {
   int 			shmem_flag = 0;
   XShmSegmentInfo	yuv_shminfo;
   int			CompletionType;
-
-
+  
+  int p_num_formats;
+  XvImageFormatValues *img_fmts;
+  
   printf("starting up video testapp...\n\n");
   
   adaptor = -1;
@@ -259,6 +261,17 @@ int main (int argc, char* argv[]) {
     XvFreeAdaptorInfo(ai);
   if (xv_port == -1)
     exit (0);
+
+  img_fmts = XvListImageFormats(dpy, xv_port, &p_num_formats);
+  
+  printf("XvListImageFormats reports %d formats\n", p_num_formats);
+  
+  for(i = 0; i < p_num_formats; i++) {
+    printf("4CC: 0x%08x,  type: %d,  byte_order: %d,  bits_per_pixel: %d,  format: %d,  num_planes: %d,  depth: %d\n", \
+        img_fmts[i].id, img_fmts[id].type, img_fmts[id].byte_order, img_fmts[i].bits_per_pixel, img_fmts[i].format, img_fmts[i].num_planes, img_fmts[i].depth);
+  }
+  
+  printf("\n\n");
   
   gc = XCreateGC(dpy, window, 0, 0);		
   
