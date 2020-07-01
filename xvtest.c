@@ -262,6 +262,7 @@ int main (int argc, char* argv[]) {
   if (xv_port == -1)
     exit (0);
 
+  /*
   img_fmts = XvListImageFormats(dpy, xv_port, &p_num_formats);
   
   printf("XvListImageFormats reports %d formats\n", p_num_formats);
@@ -272,6 +273,7 @@ int main (int argc, char* argv[]) {
   }
   
   printf("\n\n");
+  */
   
   gc = XCreateGC(dpy, window, 0, 0);		
   
@@ -293,7 +295,7 @@ int main (int argc, char* argv[]) {
     while (frames < 200) {	
       for (i = 0; i < yuv_image->height; i++) {
         for (j = 0; j < yuv_image->width; j++) {
-          yuv_image->data[yuv_image->width*i + j] = (i*j) + (num * 2);
+          yuv_image->data[yuv_image->width*i + j] = num; // (i*j) + (num * 2);
         }
       }
     
