@@ -762,6 +762,7 @@ int main()
 
     while(!should_quit) {
         XClearArea(d, win, 0, 0, 1, 1, True);
+        paint_buffer(img, width, height, offs++);
         XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
         
 #if 0
