@@ -636,6 +636,8 @@ int mitshm_error_handler(Display *d, XErrorEvent *ev)
 
 void paint_buffer(XImage *img, int width, int height, int offs)
 {
+    int x, y, ptr_offs;
+    
     for(y = 0; y < height; y++) {
         //printf("armwave: paint at row %d, stride %d\n", y, img->bytes_per_line);
         ptr_offs = y * img->bytes_per_line;
