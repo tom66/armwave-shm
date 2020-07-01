@@ -12,6 +12,13 @@
 #include <Python.h>
 #endif
 
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/XShm.h>
+
 #include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
@@ -640,8 +647,6 @@ int main()
     int width = 800, height = 600;
     int x, y;
     uint32_t ptr_offs;
-
-    Display *d;
     
     d = XOpenDisplay(NULL);
 
