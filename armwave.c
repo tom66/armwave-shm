@@ -629,7 +629,7 @@ void armwave_cleanup()
 #ifdef NO_PYTHON
 int mitshm_error_handler(Display *d, XErrorEvent *ev) 
 {
-    printf("Error: X11: MIT-SHM error (0x%08x, 0x%08x) - fatal\n", d, ev);
+    printf("armwave: error: X11: MIT-SHM error (0x%08x, 0x%08x) - fatal\n", d, ev);
     exit(-1);
     return 0;
 }
@@ -657,7 +657,7 @@ int main()
     d = XOpenDisplay(NULL);
 
     if(!d) {
-        printf("Error: X11: Couldn't open display\n");
+        printf("armwave: error: X11: Couldn't open display\n");
         exit(1);
     }
 
@@ -668,7 +668,7 @@ int main()
     vlist = XGetVisualInfo(d, VisualScreenMask, &vis, &match);
 
     if(!vlist)  {
-        printf("Error: X11: No visual available?\n");
+        printf("armwave: error: X11: No visual available?\n");
         exit(1);
     }
 
@@ -707,6 +707,8 @@ int main()
             img = NULL;
         }
         */
+    } else {
+        printf("armwave: error, MIT-SHM might not be supported?\n");
     }
 
     for(y = 0; y < height; y++) {
