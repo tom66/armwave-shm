@@ -8,7 +8,9 @@
 
 #define _GNU_SOURCE
 
+#ifndef NO_PYTHON
 #include <Python.h>
+#endif
 
 #include <assert.h>
 #include <ctype.h>
@@ -49,6 +51,10 @@ void armwave_init()
     g_armwave_state.flags = 0;
 
     printf("armwave version: %s\n", ARMWAVE_VER);
+    
+#ifndef NO_PYTHON
+    printf("built without Python linkings\n");
+#endif
 }
 
 /*
@@ -437,6 +443,7 @@ void armwave_test_dump_buffer_to_ppm(char *fn)
 /*
  * Render GDK buffer with test funtionry.
  */
+#ifndef NO_PYTHON
 void armwave_test_fill_gdkbuf(PyObject *buf)
 {
     //PyObject *mv;
@@ -448,6 +455,7 @@ void armwave_test_fill_gdkbuf(PyObject *buf)
     // TODO: use armwave_fill_pixbuf_256 for 256-height buffers for performance?
     armwave_fill_pixbuf_scaled(out_pixbuf);
 }
+#endif
 
 /*
  * Allocate a test buffer, freeing any existing buffer.
@@ -472,6 +480,7 @@ void armwave_test_buffer_alloc(int nsets)
 /*
  * Fill a pixbuf PyBuffer with a rendered waveform.
  */
+#ifndef NO_PYTHON
 PyObject *armwave_fill_pixbuf_into_pybuffer(PyObject *buf_obj)
 {
     Py_buffer buffer;
@@ -496,6 +505,7 @@ PyObject *armwave_fill_pixbuf_into_pybuffer(PyObject *buf_obj)
 
     Py_RETURN_TRUE;
 }
+#endif
 
 /*
  * Make a test AM waveform for render tests.
@@ -604,3 +614,135 @@ void armwave_cleanup()
     g_armwave_state.xcoord_to_xpixel = NULL;
     g_armwave_state.test_wave_buffer = NULL;
 }
+
+/*
+ * Main entry point for the testcase.  Based on:
+ * http://www6.uniovi.es/cscene/CS8/xlib-4.c
+ */
+#ifdef NO_PYTHON
+void mitshm_error_handler(Display *d, XErrorEvent *ev) 
+{
+    printf("Error: X11: MIT-SHM error (0x%08x, 0x%08x) - fatal\n", d, ev);
+    exit(-1);
+}
+
+int main()
+{
+    int mitshm_major_code;
+    int mitshm_minor_code;
+    Display *d;
+    XVisualInfo vis, *vlist;
+    GC gc;
+    XShmSegmentInfo shminfo;
+    XImage *img=NULL;
+    XEvent ev;
+    int (*handler)(Display *, XErrorEvent *);
+    int width = 800, height = 600;
+    int x, y;
+    uint32_t ptr_offs;
+
+    Display *d;
+    
+    d = XOpenDisplay(NULL);
+
+    if(!d) {
+        printf("Error: X11: Couldn't open display\n");
+        exit(1);
+    }
+
+    screen = DefaultScreen(d);
+    gc = DefaultGC(d, screen);
+    
+    vis.screen = screen;
+    vlist = XGetVisualInfo(d, VisualScreenMask, &vis, &match);
+
+    if(!vlist)  {
+        printf("Error: X11: No visual available?\n");
+        exit(1);
+    }
+
+    vis = vlist[0]; 
+    XFree(vlist);
+    
+    printf("armwave: visual has %d colours available.\n", vis.colormap_size);
+    printf("armwave: visual is type %d.\n", vis.class);
+    
+    if(vis.class != TrueColor) {
+        printf("armwave: error, colour class not supported (only TrueColor supported.)\n", vis.class;
+    }
+    
+    if(XShmQueryVersion(d, &mitshm_major_code, &mitshm_minor_code, &shared_pixmaps)) {
+        int (*handler)(Display *, XErrorEvent *);
+        
+        img = XShmCreateImage(d, vis.visual,
+                              vis.depth, XShmPixmapFormat(d),
+                              NULL, &shminfo, width, height);
+        shminfo.shmid = shmget(IPC_PRIVATE,
+                               img->bytes_per_line*img->height,
+                               IPC_CREAT|0777);
+        shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);
+
+        handler = XSetErrorHandler(x11_error_handler);
+        XShmAttach(d, &shminfo); /* Tell the server to attach */
+        XSync(d, 0);
+        XSetErrorHandler(handler);
+
+        shmctl(shminfo.shmid, IPC_RMID, 0);
+
+        /*
+        if(!can_use_mitshm)
+        {
+            shmdt(shminfo.shmaddr);
+            img = NULL;
+        }
+        */
+    }
+
+    for(y = 0; y < height; y++) {
+        ptr_offs = height * img->bytes_per_line;
+        for(x = 0; x < width; x++) {
+            *(img->data + ptr_offs + 0) = 0xff;
+            *(img->data + ptr_offs + 1) = x;
+            *(img->data + ptr_offs + 2) = y;
+            *(img->data + ptr_offs + 3) = x + y;
+            ptr_offs += 4;
+        }
+    }
+
+    win = XCreateSimpleWindow(d, DefaultRootWindow(d),
+                             0, 0, WIN_W, WIN_H, 0,
+                             WhitePixel(d, screen),
+                             BlackPixel(d, screen));
+    XSelectInput(d, win, ButtonPressMask|ExposureMask);
+    XMapWindow(d, win);
+
+    printf("Click to terminate\r\n");
+
+    while(!should_quit) {
+        XNextEvent(d, &ev);
+        
+        switch(ev.type) {
+            case ButtonPress:
+                should_quit = 1;
+                break;
+            
+            case Expose:
+                XShmPutImage(d, win, gc, img,
+                    0,0,
+                    0,0,
+                    width, height,
+                    True);
+                break;
+        }
+    }
+   
+	XShmDetach(d, &shminfo); /* Server detached */
+	XDestroyImage (img);	 /* Image struct freed */
+    shmdt(shminfo.shmaddr);
+    
+    XDestroyWindow(d, win);
+    XCloseDisplay(d);
+   
+    return 0;
+}
+#endif
