@@ -778,7 +778,7 @@ int main()
                 break;
         }
         
-        usleep(166670);
+        //usleep(166670);
     }
    
 	XShmDetach(d, &shminfo);
