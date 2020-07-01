@@ -727,7 +727,8 @@ int main()
     printf("armwave: start to paint buffer %d * %d\n", width, height);
     
     for(y = 0; y < height; y++) {
-        ptr_offs = height * img->bytes_per_line;
+        printf("armwave: paint at row %d, stride %d\n", y, img->bytes_per_line);
+        ptr_offs = y * img->bytes_per_line;
         
         for(x = 0; x < width; x++) {
             *(img->data + ptr_offs + 0) = 0xff;
