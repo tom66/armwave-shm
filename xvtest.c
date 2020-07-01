@@ -247,10 +247,16 @@ int main (int argc, char* argv[]) {
       printf(" image format list for port %d\n", p);
       fo = XvListImageFormats(dpy, p, &formats);
       for (j = 0; j < formats; j++) {
-	printf("  0x%x (%4.4s) %s\n",
-	       fo[j].id,
-	       (char *)&fo[j].id,
-	       (fo[j].format == XvPacked) ? "packed" : "planar");
+        /*
+        printf("  0x%x (%4.4s) %s\n",
+               fo[j].id,
+               (char *)&fo[j].id,
+               (fo[j].format == XvPacked) ? "packed" : "planar");
+        */
+        
+        printf("4CC: 0x%08x,  type: %d,  byte_order: %d,  bits_per_pixel: %d,  format: %d,  num_planes: %d,  depth: %d, pack:  %s\n", \
+            fo[j].id, fo[j].type, fo[j].byte_order, fo[j].bits_per_pixel, fo[j].format, fo[j].num_planes, fo[j].depth, 
+            (fo[j].format == XvPacked) ? "packed" : "planar");
       }
       if (fo)
 	XFree(fo);
