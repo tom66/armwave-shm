@@ -302,8 +302,8 @@ int main (int argc, char* argv[]) {
     while (frames < 200) {	
       for (i = 0; i < yuv_image->height; i++) {
         for (j = 0; j < yuv_image->width; j += 4) {
-          yuv_image->data[yuv_image->width*i + j + 0] = num;  
-          yuv_image->data[yuv_image->width*i + j + 1] = 0x00;
+          yuv_image->data[yuv_image->width*i + j + 0] = 0xff;  
+          yuv_image->data[yuv_image->width*i + j + 1] = 0xff;
           yuv_image->data[yuv_image->width*i + j + 2] = 0x00;
           yuv_image->data[yuv_image->width*i + j + 3] = 0x00;
         }
