@@ -765,7 +765,6 @@ int main()
         paint_buffer(img, width, height, offs++);
         XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
         
-#if 0
         XNextEvent(d, &ev);
         
         switch(ev.type) {
@@ -773,14 +772,11 @@ int main()
                 should_quit = 1;
                 break;
             
-            /*
             case Expose:
-                paint_buffer(img, width, height, offs++);
-                XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
+                //paint_buffer(img, width, height, offs++);
+                //XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
                 break;
-            */
         }
-#endif
         
         usleep(16667);
     }
