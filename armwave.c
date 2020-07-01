@@ -675,8 +675,8 @@ int main()
     vis = vlist[0]; 
     XFree(vlist);
     
-    printf("armwave: visual has %d colours available.\n", vis.colormap_size);
-    printf("armwave: visual is type %d.\n", vis.class);
+    printf("armwave: visual has %d colours available\n", vis.colormap_size);
+    printf("armwave: visual is type %d\n", vis.class);
     
     if(vis.class != TrueColor) {
         printf("armwave: error, colour class not supported (only TrueColor supported.)\n", vis.class);
@@ -685,19 +685,31 @@ int main()
     if(XShmQueryVersion(d, &mitshm_major_code, &mitshm_minor_code, &shared_pixmaps)) {
         int (*handler)(Display *, XErrorEvent *);
         
+        printf("armwave: starting to create MIT-SHM object (SHMver: %d.%d)\n", mitshm_major_code, mitshm_minor_code);
+        
         img = XShmCreateImage(d, vis.visual,
                               vis.depth, XShmPixmapFormat(d),
                               NULL, &shminfo, width, height);
+                              
+        printf("armwave: created ShmImage 0x%08x\n", image);
+        
         shminfo.shmid = shmget(IPC_PRIVATE,
                                img->bytes_per_line*img->height,
                                IPC_CREAT|0777);
+                               
+        printf("armwave: got SHMID %d\n", shminfo.shmid);
+        
         shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);
 
+        printf("armwave: got SHM addr 0x%08x\n", shminfo.shmaddr);
+        
         handler = XSetErrorHandler(mitshm_error_handler);
         XShmAttach(d, &shminfo); /* Tell the server to attach */
         XSync(d, 0);
         XSetErrorHandler(handler);
 
+        printf("armwave: error handler set\n");
+        
         shmctl(shminfo.shmid, IPC_RMID, 0);
 
         /*
