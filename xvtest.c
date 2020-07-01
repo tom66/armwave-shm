@@ -268,7 +268,7 @@ int main (int argc, char* argv[]) {
   
   for(i = 0; i < p_num_formats; i++) {
     printf("4CC: 0x%08x,  type: %d,  byte_order: %d,  bits_per_pixel: %d,  format: %d,  num_planes: %d,  depth: %d\n", \
-        img_fmts[i].id, img_fmts[id].type, img_fmts[id].byte_order, img_fmts[i].bits_per_pixel, img_fmts[i].format, img_fmts[i].num_planes, img_fmts[i].depth);
+        img_fmts[i].id, img_fmts[i].type, img_fmts[i].byte_order, img_fmts[i].bits_per_pixel, img_fmts[i].format, img_fmts[i].num_planes, img_fmts[i].depth);
   }
   
   printf("\n\n");
