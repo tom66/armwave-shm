@@ -691,7 +691,7 @@ int main()
                               vis.depth, XShmPixmapFormat(d),
                               NULL, &shminfo, width, height);
                               
-        printf("armwave: created ShmImage 0x%08x\n", image);
+        printf("armwave: created ShmImage 0x%08x\n", img);
         
         shminfo.shmid = shmget(IPC_PRIVATE,
                                img->bytes_per_line*img->height,
