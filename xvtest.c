@@ -275,17 +275,16 @@ int main (int argc, char* argv[]) {
   printf("%d\n", yuv_image->data_size);
   
   while (1) {
-    for (i = 0; i < yuv_image->height; i++) {
-      for (j = 0; j < yuv_image->width; j++) {
-        yuv_image->data[yuv_image->width*i + j] = (i*j) + num;
-      }
-    }
-    
-    num += 1;
-  
     frames = secsa = secsb = 0;
     time(&secsa);
     while (frames < 200) {	
+      for (i = 0; i < yuv_image->height; i++) {
+        for (j = 0; j < yuv_image->width; j++) {
+          yuv_image->data[yuv_image->width*i + j] = i + (num * 5);
+        }
+      }
+    
+      num += 1;
       XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
       
       XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
