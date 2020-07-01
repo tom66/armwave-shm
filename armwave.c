@@ -761,18 +761,22 @@ int main()
     printf("Click to terminate\r\n");
 
     while(!should_quit) {
-        XClearArea(d, win, 0, 0, 1, 1, True);
+        //XClearArea(d, win, 0, 0, 1, 1, True);
+        XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
         XNextEvent(d, &ev);
+        
         
         switch(ev.type) {
             case ButtonPress:
                 should_quit = 1;
                 break;
             
+            /*
             case Expose:
                 paint_buffer(img, width, height, offs++);
                 XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
                 break;
+            */
         }
         
         usleep(16667);
