@@ -170,8 +170,8 @@ void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct arm
         *data_u = yuv->u;
         *data_v = yuv->v;
         data_y += img->width;
-        data_u += img->width / 2;
-        data_v += img->width / 2;
+        data_u += img->width / 4;
+        data_v += img->width / 4;
     }
     
     // Compute the masks for writing the UV pixel value
