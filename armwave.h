@@ -35,6 +35,8 @@
 #define COND_UNLIKELY(expr)         __builtin_expect((expr), 0)
 #define COND_LIKELY(expr)           __builtin_expect((expr), 1)
 
+#define GUID_YUV12_PLANAR           0x32315659      // FOURCC for YUV12 format
+
 typedef uint16_t bufftyp_t;
 
 struct armwave_color_mix_t {
