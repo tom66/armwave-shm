@@ -301,11 +301,9 @@ int main (int argc, char* argv[]) {
     time(&secsa);
     while (frames < 200) {	
       for (i = 0; i < yuv_image->height; i++) {
-        for (j = 0; j < yuv_image->width; j += 4) {
-          yuv_image->data[yuv_image->width*i + j + 0] = 0xff;  
-          yuv_image->data[yuv_image->width*i + j + 1] = 0xff;
-          yuv_image->data[yuv_image->width*i + j + 2] = 0x00;
-          yuv_image->data[yuv_image->width*i + j + 3] = 0x00;
+        for (j = 0; j < yuv_image->width; j += 1) {
+          yuv_image->data[yuv_image->width*i + j] = 0xff;  
+          yuv_image->data[(yuv_image->width*yuv_image->height) + (yuv_image->width*i*0.5f) + j] = 0xff;  
         }
       }
     
