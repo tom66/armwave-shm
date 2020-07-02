@@ -76,7 +76,7 @@ void plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
 void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, struct armwave_color_mix_t *color1)
 {
     int v;
-    struct armwave_color_mix_t temp;
+    struct armwave_rgb_t temp;
     
     switch(palette) {
         case 0:
