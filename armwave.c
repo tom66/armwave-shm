@@ -696,7 +696,7 @@ int main()
      */
     printf("Preparing test waveforms...\n");
     armwave_setup_render(0, 1024, 256, 1024, 1024, 256, 0);
-    armwave_test_create_am_sine(0.5, 1e-6, 128);
+    armwave_test_create_am_sine(0.5, 1e-6, 8);
     printf("Done, starting XVideo...\n");
     
     /*
