@@ -20,6 +20,8 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XShm.h>
 
+#define GUID_YUV12_PLANAR 0x32315659
+
 struct yuv_t {
         uint8_t y, u, v;
 };
@@ -28,76 +30,61 @@ struct rgb_t {
         uint8_t r, g, b;
 };
 
-extern int 	XShmQueryExtension(Display*);
-extern int 	XShmGetEventBase(Display*);
-extern XvImage    *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
+extern int XShmQueryExtension(Display*);
+extern int XShmGetEventBase(Display*);
+extern XvImage *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
 
 void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out)
 {
-        yuv_out->y =    16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
-        yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
-        yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
-        
-        //printf("RGB:%d,%d,%d    YUV:%d,%d,%d\n", rgb_in->r, rgb_in->g, rgb_in->b, yuv_out->y, yuv_out->u, yuv_out->v);
+    yuv_out->y =  16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
+    yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
+    yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
 }
 
 void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
 {
-        int uv_base = img->width * img->height;
-        
-        /*
-        if(x == 0) {
-                printf("%d,%d %d %d %d\n", \
-                        x, y, 
-                        (img->width * y) + x, \
-                        img->offsets[1] + (img->pitches[1] * (y / 2)) + (x / 2), \
-                        img->offsets[2] + (img->pitches[2] * (y / 2)) + (x / 2));
-        }
-        */
-        
-        img->data[(img->width * y) + x] = yuv_in->y; 
-        img->data[img->offsets[1] + (img->pitches[1] * (y / 2)) + (x / 2)] = yuv_in->v;
-        img->data[img->offsets[2] + (img->pitches[2] * (y / 2)) + (x / 2)] = yuv_in->u;
+    int uv_base = img->width * img->height;
+    
+    img->data[(img->width * y) + x] = yuv_in->y; 
+    img->data[img->offsets[1] + (img->pitches[1] * (y / 2)) + (x / 2)] = yuv_in->v;
+    img->data[img->offsets[2] + (img->pitches[2] * (y / 2)) + (x / 2)] = yuv_in->u;
 }
 
 int main (int argc, char* argv[]) {
-    int		yuv_width = 1024;
-    int		yuv_height = 256;
+    int	yuv_width = 1024;
+    int	yuv_height = 256;
     
-    int		xv_port = -1;
-    int		adaptor, encodings, attributes, formats;
-    int		i, j, ret, p, _d, _w, _h, n;
-    long		secsb, secsa, frames;
+    int	xv_port = -1;
+    int	adaptor, encodings, attributes, formats;
+    int	i, j, ret, p, _d, _w, _h, n;
+    long secsb, secsa, frames;
     
-    XvAdaptorInfo		*ai;
-    XvEncodingInfo	*ei;
-    XvAttribute		*at;
+    XvAdaptorInfo *ai;
+    XvEncodingInfo *ei;
+    XvAttribute	*at;
     XvImageFormatValues	*fo;
 
-    XvImage		*yuv_image;
+    XvImage	*yuv_image;
 
-#define GUID_YUV12_PLANAR 0x32315659
-
-    unsigned int		p_version, p_release,
-    			p_request_base, p_event_base, p_error_base;
-    int			p_num_adaptors;
+    unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
+    int	p_num_adaptors;
      	
-    Display		*dpy;
-    Window		window, _dw;
-    XSizeHints		hint;
-    XSetWindowAttributes	xswa;
-    XVisualInfo		vinfo;
-    int			screen;
-    unsigned long		mask;
-    XEvent		event;
-    GC			gc;
+    Display	*dpy;
+    Window	window, _dw;
+    XSizeHints hint;
+    XSetWindowAttributes xswa;
+    XVisualInfo	vinfo;
+    int	screen;
+    unsigned long mask;
+    XEvent event;
+    GC gc;
     
-    int                     num = 0;
+    int num = 0;
 
     /** for shm */
-    int 			shmem_flag = 0;
+    int shmem_flag = 0;
     XShmSegmentInfo	yuv_shminfo;
-    int			CompletionType;
+    int	CompletionType;
     
     int p_num_formats;
     XvImageFormatValues *img_fmts;
@@ -109,7 +96,7 @@ int main (int argc, char* argv[]) {
     
     struct rgb_t rgb_col;
     
-    printf("starting up video testapp...\n\n");
+    printf("Starting up testapp...\n\n");
     
     adaptor = -1;
 	
@@ -123,10 +110,10 @@ int main (int argc, char* argv[]) {
     
     /** find best display */
     if (XMatchVisualInfo(dpy, screen, 24, TrueColor, &vinfo)) {
-            printf("Found 24bit TrueColor.\n");
+        printf("Found 24bit TrueColor.\n");
     } else {
-            printf("Error: not supported 24-bit TrueColor display.    Cannot start.\n");
-            exit(-1);
+        printf("Error: Fatal X11: not supported 24-bit TrueColor display.    Cannot start.\n");
+        exit(-1);
     }
     
     CompletionType = -1;	
@@ -137,7 +124,7 @@ int main (int argc, char* argv[]) {
     hint.height = yuv_height;
     hint.flags = PPosition | PSize;
     
-    xswa.colormap =    XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
+    xswa.colormap =  XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
     xswa.border_pixel = 0;
@@ -155,10 +142,8 @@ int main (int argc, char* argv[]) {
     
     XStoreName(dpy, window, "firstxv");
     XSetIconName(dpy, window, "firstxv");
-    
     XSelectInput(dpy, window, StructureNotifyMask);
     
-    /** Map window */
     XMapWindow(dpy, window);
     
     /** Wait for map. */
@@ -176,14 +161,11 @@ int main (int argc, char* argv[]) {
     if (shmem_flag==1) CompletionType = XShmGetEventBase(dpy) + ShmCompletion;
     
     
-    /**--------------------------------- XV ------------------------------------*/
-    printf("beginning to parse the Xvideo extension...\n\n");
-    
     /** query and print Xvideo properties */
     ret = XvQueryExtension(dpy, &p_version, &p_release, &p_request_base,
 			 &p_event_base, &p_error_base);
     if (ret != Success) {
-        printf("Error: Fatal: Unable to find XVideo extension (%d).  Is it configured correctly?\n\n", ret);
+        printf("Error: Fatal X11: Unable to find XVideo extension (%d).  Is it configured correctly?\n\n", ret);
         exit(-1);
     }
     
@@ -191,13 +173,15 @@ int main (int argc, char* argv[]) {
 			&p_num_adaptors, &ai);
     
     if (ret != Success) {
-        printf("Error: Fatal: Unable to query XVideo extension (%d).  Is it configured correctly?\n\n", ret);
+        printf("Error: Fatal X11: Unable to query XVideo extension (%d).  Is it configured correctly?\n\n", ret);
         exit(-1);
     }
     
     // Use the last port available
-    for (i = 0; i < p_num_adaptors; i++) {
-        xv_port = ai[i].base_id;
+    xv_port = ai[p_num_adaptors - 1].base_id;
+    if(xv_port == -1) {
+        printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
+        exit(-1);
     }
     
     gc = XCreateGC(dpy, window, 0, 0);		
