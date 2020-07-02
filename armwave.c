@@ -206,7 +206,7 @@ void armwave_fill_xvimage_scaled(XvImage *img)
                 value = wave_word & 0xffff;
                 wave_word >>= 16;
 
-                if(value != 0) {
+                if(value != 0) {7
                     /*
                     rr = (g_armwave_state.ch1_color.r * value) >> 8;
                     gg = (g_armwave_state.ch1_color.g * value) >> 8;
@@ -222,15 +222,15 @@ void armwave_fill_xvimage_scaled(XvImage *img)
 
                     // Plot the pixels
                     nsub = n + w;
-                    yy = (nsub & 0xff) * g_armwave_state.vscale_frac;
-                    ye = ((nsub & 0xff) + 1) * g_armwave_state.vscale_frac;
+                    yy = (nsub & 0xff); // * g_armwave_state.vscale_frac;
+                    ye = ((nsub & 0xff) + 1); // * g_armwave_state.vscale_frac;
                     xx = (nsub >> 8) / 2;
 
                     for(y = yy; y < ye; y++) {
                         //offset = (xx + ((g_armwave_state.target_height - y) * g_armwave_state.target_width)); 
                         //printf("0x%08x,%6d,%6d,%6d,%6d,%4d,%.3f\n", out_buffer_base, offset, xx, y, n, g_armwave_state.target_width, g_armwave_state.vscale_frac);
                         //*(out_buffer_base + offset) = word;
-                        plot_pixel_yuv(img, x, y, &yuv_lut[MIN(value, 255)]);
+                        plot_pixel_yuv(img, xx, yy, &yuv_lut[MIN(value, 255)]);
                         painted++;
                     }
                 }
