@@ -11,6 +11,8 @@
 #include <sys/ipc.h>
 #include <sys/shm.h>
 
+#include <stdint.h>
+
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xatom.h>
