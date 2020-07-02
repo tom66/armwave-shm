@@ -291,9 +291,6 @@ int main (int argc, char* argv[]) {
             fo[j].id, fo[j].type, fo[j].byte_order, fo[j].bits_per_pixel, fo[j].format, fo[j].num_planes, fo[j].depth,  \
             (fo[j].format == XvPacked) ? "packed" : "planar", fo[j].component_order, \
             fo[j].y_sample_bits, fo[j].u_sample_bits, fo[j].v_sample_bits);
-        for(n = 0; n < fo[j].num_planes; n++) {
-           printf("plane %d pitch %d offset %d\n", n, fo[j].offsets[n], fo[j].pitches[n]);
-        }
       }
       if (fo)
 	XFree(fo);
@@ -324,6 +321,10 @@ int main (int argc, char* argv[]) {
   yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
   yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
   yuv_shminfo.readOnly = False;
+  
+  for(n = 0; n < yuv_image->num_planes; n++) {
+    printf("yuv_image plane %d pitch %d offset %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
+  }
   
   if (!XShmAttach(dpy, &yuv_shminfo)) {
     printf("XShmAttach failed !\n");
