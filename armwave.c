@@ -804,6 +804,9 @@ int main()
     printf("%d\n", yuv_image->data_size);
     
     while (1) {
+        armwave_set_wave_pointer_as_testbuf(0);
+        armwave_generate();
+        
         //frames = secsa = secsb = 0;
         //time(&secsa);
         
