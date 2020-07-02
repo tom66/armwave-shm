@@ -60,7 +60,7 @@ int main (int argc, char* argv[]) {
   
   int		xv_port = -1;
   int		adaptor, encodings, attributes, formats;
-  int		i, j, ret, p, _d, _w, _h;
+  int		i, j, ret, p, _d, _w, _h, n;
   long		secsb, secsa, frames;
   
   XvAdaptorInfo		*ai;
@@ -291,6 +291,9 @@ int main (int argc, char* argv[]) {
             fo[j].id, fo[j].type, fo[j].byte_order, fo[j].bits_per_pixel, fo[j].format, fo[j].num_planes, fo[j].depth,  \
             (fo[j].format == XvPacked) ? "packed" : "planar", fo[j].component_order, \
             fo[j].y_sample_bits, fo[j].u_sample_bits, fo[j].v_sample_bits);
+        for(n = 0; n < fo[j].num_planes; n++) {
+           printf("plane %d pitch %d offset %d\n", n, fo[j].offsets[n], fo[j].pitches[n]);
+        }
       }
       if (fo)
 	XFree(fo);
