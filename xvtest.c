@@ -48,8 +48,8 @@ void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
     printf("%d,%d\n", x, y);
     
     img->data[(img->width * y) + x] = yuv_in->y; 
-    img->data[img->offsets[1] + (img->pitch[1] * y) + (x / 2)] = yuv_in->v;
-    img->data[img->offsets[2] + (img->pitch[2] * y) + (x / 2)] = yuv_in->u;
+    img->data[img->offsets[1] + (img->pitches[1] * y) + (x / 2)] = yuv_in->v;
+    img->data[img->offsets[2] + (img->pitches[2] * y) + (x / 2)] = yuv_in->u;
 }
 
 int main (int argc, char* argv[]) {
@@ -226,6 +226,7 @@ int main (int argc, char* argv[]) {
   printf("XvQueryAdaptors returned the following:\n");
   printf("%d adaptors available.\n", p_num_adaptors);
   for (i = 0; i < p_num_adaptors; i++) {
+    /*
     printf(" name:        %s\n"
 	   " type:        %s%s%s%s%s\n"
 	   " ports:       %ld\n"
@@ -238,19 +239,23 @@ int main (int argc, char* argv[]) {
 	   (ai[i].type & XvImageMask)	? "image | "	: "",
 	   ai[i].num_ports,
 	   ai[i].base_id);
+    */
+    
     xv_port = ai[i].base_id;
     
-    printf("adaptor %d ; format list:\n", i);
+    //printf("adaptor %d ; format list:\n", i);
     for (j = 0; j < ai[i].num_formats; j++) {
+      /*
       printf(" depth=%d, visual=%ld\n",
 	     ai[i].formats[j].depth,
 	     ai[i].formats[j].visual_id);
+      */
     }
     for (p = ai[i].base_id; p < ai[i].base_id+ai[i].num_ports; p++) {
       
-      printf(" encoding list for port %d\n", p);
+      //printf(" encoding list for port %d\n", p);
       if (XvQueryEncodings(dpy, p, &encodings, &ei) != Success) {
-	printf("XvQueryEncodings failed.\n");
+	//printf("XvQueryEncodings failed.\n");
 	continue;
       }
       for (j = 0; j < encodings; j++) {
@@ -260,9 +265,10 @@ int main (int argc, char* argv[]) {
       }
       XvFreeEncodingInfo(ei);
       
-      printf(" attribute list for port %d\n", p);
+      //printf(" attribute list for port %d\n", p);
       at = XvQueryPortAttributes(dpy, p, &attributes);
       for (j = 0; j < attributes; j++) {
+        /*
         printf("  name:       %s\n"
                "  flags:     %s%s\n"
                "  min_color:  %i\n"
@@ -271,6 +277,7 @@ int main (int argc, char* argv[]) {
                (at[j].flags & XvGettable) ? " get" : "",
                (at[j].flags & XvSettable) ? " set" : "",						
                at[j].min_value, at[j].max_value);
+        */
       }
       if (at)
 	XFree(at);
