@@ -334,7 +334,7 @@ int main (int argc, char* argv[]) {
         yuv_col.y = num;
         yuv_col.u = i;
         yuv_col.v = j;
-        plot_pixel_yuv(yuv_image, i, j, &yuv_col);
+        plot_pixel_yuv(yuv_image, j, i, &yuv_col);
         //yuv_image->data[yuv_image->width*i + j] = i + num;  
         //yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;  
       }
