@@ -72,8 +72,8 @@ enum {
 void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out)
 {
     yuv_out->y =  16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
-    yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
-    yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
+    yuv_out->v = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
+    yuv_out->u = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
 }
 
 /*
@@ -136,8 +136,8 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
         printf("3:%d,%d\n", x0, y);
         *data_y++ = yword;
         *data_y++ = yword;
-        *data_u++ = vword;
-        *data_v++ = uword;
+        *data_u++ = uword;
+        *data_v++ = vword;
     }
     
     // Write remaining pixels until length is zero
