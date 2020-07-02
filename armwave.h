@@ -43,7 +43,7 @@ struct armwave_color_mix_t {
     int16_t r, g, b;
 };
 
-struct yuv_t {
+struct armwave_yuv_t {
     uint8_t y, u, v;
 };
 
@@ -137,5 +137,5 @@ void armwave_test_dump_buffer_to_ppm(char *fn);
 void armwave_generate(void);
 void armwave_cleanup(void);
 
-void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out);
-void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in);
+void rgb2yuv(struct rgb_t *rgb_in, struct armwave_yuv_t *yuv_out);
+void plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in);
