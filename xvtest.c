@@ -38,7 +38,7 @@ void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out)
     yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
     yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
     
-    printf("RGB:%d,%d,%d  YUV:%d,%d,%d\n", rgb_in->r, rgb_in->g, rgb_in->b, yuv_out->y, yuv_out->u, yuv_out->v);
+    //printf("RGB:%d,%d,%d  YUV:%d,%d,%d\n", rgb_in->r, rgb_in->g, rgb_in->b, yuv_out->y, yuv_out->u, yuv_out->v);
 }
 
 void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
@@ -347,8 +347,8 @@ int main (int argc, char* argv[]) {
     for (i = 0; i < yuv_image->height; i += 1) {
       for (j = 0; j < yuv_image->width; j += 1) {
         rgb_col.r = i;
-        rgb_col.g = i;
-        rgb_col.b = i;
+        rgb_col.g = num;
+        rgb_col.b = 0;
         rgb2yuv(&rgb_col, &yuv_col);
         
         //yuv_col.y = num;
