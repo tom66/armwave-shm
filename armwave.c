@@ -772,7 +772,7 @@ int main()
     
     xswa.colormap =  XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
-    xswa.background_pixel = 0x80808080;
+    xswa.background_pixel = 0;
     xswa.border_pixel = 0;
     
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
@@ -800,12 +800,14 @@ int main()
     /*
      * Try to strip decoration from window.
      */
+    /*
     Atom mwmHintsProperty = XInternAtom(dpy, "_MOTIF_WM_HINTS", 0);
     struct MwmHints hints;
     hints.flags = MWM_HINTS_DECORATIONS;
     hints.decorations = 0;
     XChangeProperty(dpy, window, mwmHintsProperty, mwmHintsProperty, 32,
             PropModeReplace, (unsigned char *)&hints, 5);
+    */
     
     /*
      * Query the MITSHM extension - check it is available.
