@@ -357,7 +357,7 @@ int main (int argc, char* argv[]) {
     /* XFlush(dpy); */
      
     //num++;
-    // printf("num=%d\n", num & 0xff);
+    printf("num=%d\n", num & 0xff);
       
     //time(&secsb);
     //printf("%ld frames in %ld seconds; %.4f fps\n", frames, secsb-secsa, (double) frames/(secsb-secsa));
