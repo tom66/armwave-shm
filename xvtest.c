@@ -300,8 +300,8 @@ int main (int argc, char* argv[]) {
     //frames = secsa = secsb = 0;
     //time(&secsa);
     
-    for (i = 0; i < yuv_image->height; i++) {
-      for (j = 0; j < yuv_image->width; j += 1) {
+    for (i = 0; i < yuv_image->height; i += 10) {
+      for (j = 0; j < yuv_image->width; j += 10) {
         yuv_image->data[yuv_image->width*i + j] = i + num;  
         yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;  
       }
