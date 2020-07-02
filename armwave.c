@@ -947,7 +947,7 @@ int main()
         armwave_fill_xvimage_scaled(yuv_image);
         
         for(j = 0; j < yuv_image->height; j += 16) {
-            draw_horiz_line_fast_rgb_xvimage(yuv_image, 0, yuv_image->width, j, grat_col);
+            draw_horiz_line_fast_rgb_xvimage(yuv_image, 0, yuv_image->width, j, &grat_col);
         } 
 
         num += 1;
