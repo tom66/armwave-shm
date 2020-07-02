@@ -29,7 +29,7 @@ void put_pixel(char* data, int x, int y, int maxx, int p) {
 	
 
 int main (int argc, char* argv[]) {
-  int		yuv_width = 1000;
+  int		yuv_width = 900;
   int		yuv_height = 800;
   
   int		xv_port = -1;
@@ -303,7 +303,7 @@ int main (int argc, char* argv[]) {
       for (i = 0; i < yuv_image->height; i++) {
         for (j = 0; j < yuv_image->width; j += 1) {
           yuv_image->data[yuv_image->width*i + j] = i + frames;  
-          yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + j] = j + frames;  
+          yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + frames;  
         }
       }
     
