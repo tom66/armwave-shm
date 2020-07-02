@@ -90,7 +90,7 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
             break;
     }
     
-    for(v = 0; v < 255; v++) {
+    for(v = 0; v < 256; v++) {
         printf("%3d = (%3d, %3d, %3d)\n", v, yuv_lut[v].y, yuv_lut[v].u, yuv_lut[v].v);
     }
 }
@@ -171,10 +171,9 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
 }
 
 /*
- * Fill a pixbuf with a multiple of a 256-height waveform.
- * Rows are repeated as necessary.
+ * Render buffer to an XvImage canvas.
  */
-void armwave_fill_pixbuf_scaled(uint32_t *out_buffer)
+void armwave_fill_pixbuf_scaled(XvImage *img)
 {
     uint32_t xx, yy, ye, y, word, wave_word, painted = 0;
     // uint32_t ysub;
@@ -198,20 +197,12 @@ void armwave_fill_pixbuf_scaled(uint32_t *out_buffer)
         g_armwave_state.ch_buff_size, base_32ptr, out_buffer_base, &w);
 
     // we don't really want to be doing this if possible;  os.madvise may be a better option
-    memset(out_buffer, 0x00, g_armwave_state.target_width * g_armwave_state.target_height * 4);
+    //memset(out_buffer, 0x00, g_armwave_state.target_width * g_armwave_state.target_height * 4);
 
     //printf("iter...\n");
 
     for(n = 0; n < npix; n += 2) {
-        //wave_word = g_armwave_state.ch1_buffer[n]
-        //wave_word = 0x12345678;
         wave_word = *base_32ptr++;
-
-        /*
-        if(n % 200 == 0) {
-           printf("%d\n", n);
-        }
-        */
 
         if(COND_UNLIKELY(wave_word != 0)) {
             for(w = 0; w < 2; w++) {
@@ -219,6 +210,7 @@ void armwave_fill_pixbuf_scaled(uint32_t *out_buffer)
                 wave_word >>= 16;
 
                 if(value != 0) {
+                    /*
                     rr = (g_armwave_state.ch1_color.r * value) >> 8;
                     gg = (g_armwave_state.ch1_color.g * value) >> 8;
                     bb = (g_armwave_state.ch1_color.b * value) >> 8;
@@ -229,6 +221,7 @@ void armwave_fill_pixbuf_scaled(uint32_t *out_buffer)
 
                     // Ensure 100% alpha channel, if it is used
                     word = 0xff000000 | (b << 16) | (g << 8) | r;
+                    */
 
                     // Plot the pixels
                     nsub = n + w;
@@ -237,9 +230,10 @@ void armwave_fill_pixbuf_scaled(uint32_t *out_buffer)
                     xx = (nsub >> 8) / 2;
 
                     for(y = yy; y < ye; y++) {
-                        offset = (xx + ((g_armwave_state.target_height - y) * g_armwave_state.target_width)); 
+                        //offset = (xx + ((g_armwave_state.target_height - y) * g_armwave_state.target_width)); 
                         //printf("0x%08x,%6d,%6d,%6d,%6d,%4d,%.3f\n", out_buffer_base, offset, xx, y, n, g_armwave_state.target_width, g_armwave_state.vscale_frac);
-                        *(out_buffer_base + offset) = word;
+                        //*(out_buffer_base + offset) = word;
+                        plot_pixel_yuv(img, x, y, &yuv_lut[MIN(value, 255)]);
                         painted++;
                     }
                 }
