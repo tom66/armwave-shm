@@ -109,7 +109,9 @@ void plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in);
 void fill_rgb_xvimage(XvImage *img, struct armwave_rgb_t *rgb);
 
 void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_yuv_t *yuv);
+void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *yuv);
 void draw_horiz_line_fast_rgb_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_rgb_t *rgb);
+void draw_vert_line_fast_rgb_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *yuv);
 
 void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, struct armwave_color_mix_t *color1);
 

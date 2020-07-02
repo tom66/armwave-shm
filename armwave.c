@@ -150,6 +150,33 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
 }
 
 /*
+ * Draw a vertical line quickly.  
+ *
+ * Colour should be passed as YUV to reduce calculation overhead.  y0 must be less than y1
+ * (behaviour is undefined if this is not the case.)
+ */
+void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *yuv)
+{
+    int length;
+    uint32_t *data_y, *data_u, *data_v;
+    uint32_t y_nmask, u_nmask, v_nmask;
+    uint32_t y_omask, u_omask, v_omask;
+    
+    // Compute the masks for writing the pixel value
+    y_nmask = ~(0x000000ff << ((x & 3) * 8));
+    y_omask =  (yuv.y      << ((x & 3) * 8));
+    
+    // Find the X-address for the first pixel starting at y0.  Increment by the width for each write.
+    data_y = (uint32_t*)(img->data +(img->width * y0) + (x & ~0x03));
+    
+    for(length = y1 - y0; length > 0; length--, y0++) {
+        *data_y &= y_nmask;
+        *data_y |= y_omask;
+        data_y++;
+    }
+}
+
+/*
  * Fast horizontal line drawing function that supports RGB.
  */
 void draw_horiz_line_fast_rgb_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_rgb_t *rgb)
@@ -158,6 +185,17 @@ void draw_horiz_line_fast_rgb_xvimage(XvImage *img, int x0, int x1, int y, struc
     
     rgb2yuv(rgb, &yuv);
     draw_horiz_line_fast_xvimage(img, x0, x1, y, &yuv);
+}
+
+/*
+ * Fast vertical line drawing function that supports RGB.
+ */
+void draw_vert_line_fast_rgb_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *yuv)
+{
+    struct armwave_yuv_t yuv;
+    
+    rgb2yuv(rgb, &yuv);
+    draw_vert_line_fast_xvimage(img, x, y0, y1, &yuv);
 }
 
 /*
@@ -952,8 +990,13 @@ int main()
         
 #if 1
         for(j = 32; j < yuv_image->height; j += 32) {
-            printf("Render line %d\n", j);
+            printf("Render H-line %d\n", j);
             draw_horiz_line_fast_rgb_xvimage(yuv_image, 0, num % yuv_image->width, j, &grat_rgb_col);
+        } 
+        
+        for(j = 32; j < yuv_image->height; j += 32) {
+            printf("Render V-line %d\n", j);
+            draw_vert_line_fast_rgb_xvimage(yuv_image, j, 0, num % yuv_image->height, &grat_rgb_col);
         } 
 #endif
 
