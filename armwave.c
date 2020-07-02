@@ -706,6 +706,8 @@ int main()
     struct armwave_rgb_t rgb_col;
     int num = 0;
     
+    int n_test_waves = 8;
+    
     yuv_col.y = 255;
     yuv_col.u = 127;
     yuv_col.v = 127;
@@ -730,7 +732,7 @@ int main()
     armwave_setup_render(0, 1024, 256, 1024, 1024, 256, 0);
     armwave_set_channel_colour(1, 2550, 1780, 250);
     armwave_prep_yuv_palette(0, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
-    armwave_test_create_am_sine(0.5, 1e-6, 8);
+    armwave_test_create_am_sine(0.5, 1e-6, n_test_waves);
     printf("Done, starting XVideo...\n");
     
     /*
@@ -837,7 +839,7 @@ int main()
     printf("%d\n", yuv_image->data_size);
     
     while (1) {
-        armwave_set_wave_pointer_as_testbuf(0);
+        armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
         armwave_generate();
         
         //frames = secsa = secsb = 0;
