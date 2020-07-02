@@ -166,6 +166,8 @@ void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct arm
     y_nmask = ~(0x000000ff << ((x & 3) * 8));
     y_omask =  (yuv->y     << ((x & 3) * 8));
     
+    printf("%08x %08x\n", y_nmask, y_omask);
+    
     // Find the X-address for the first pixel starting at y0.  Increment by the width for each write.
     data_y = (uint32_t*)(img->data + (img->width * y0) + (x & ~0x03));
     
