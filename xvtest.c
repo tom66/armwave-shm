@@ -47,13 +47,11 @@ void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
     
     img->data[(img->width * y) + x] = yuv_in->y; 
     
-    /*
     if(x & 1) {
-        img->data[uv_base + ((img->width * y) / 2) + (x / 2) + 0] = yuv_in->u;  
+        img->data[uv_base + (img->width * (y / 2)) + (x / 2)] = yuv_in->u;  
     } else {
-        img->data[uv_base + ((img->width * y) / 2) + (x / 2) + 1] = yuv_in->v;  
+        img->data[uv_base + ((img->width * y) / 2) + (x / 2)] = yuv_in->v;  
     }
-    */
 }
 
 int main (int argc, char* argv[]) {
@@ -350,7 +348,7 @@ int main (int argc, char* argv[]) {
       for (j = 0; j < yuv_image->width; j += 1) {
         rgb_col.r = 0;
         rgb_col.g = 0;
-        rgb_col.b = i;
+        rgb_col.b = 0;
         rgb2yuv(&rgb_col, &yuv_col);
         
         //yuv_col.y = num;
