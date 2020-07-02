@@ -283,7 +283,7 @@ void armwave_fill_xvimage_scaled(XvImage *img)
 
     // we don't really want to be doing this if possible;  os.madvise may be a better option
     //memset(out_buffer, 0x00, g_armwave_state.target_width * g_armwave_state.target_height * 4);
-    fill_xvimage(img, &fill_black);
+    fill_rgb_xvimage(img, &fill_black);
     
     //printf("iter...\n");
 
@@ -787,8 +787,6 @@ int main()
     rgb2yuv(&grat_rgb_col, &grat_col);
     
     printf("Starting up testapp...\n\n");
-    
-    
     
     /*
      * Try to open the display.
