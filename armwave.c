@@ -190,7 +190,7 @@ void draw_horiz_line_fast_rgb_xvimage(XvImage *img, int x0, int x1, int y, struc
 /*
  * Fast vertical line drawing function that supports RGB.
  */
-void draw_vert_line_fast_rgb_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *yuv)
+void draw_vert_line_fast_rgb_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *rgb)
 {
     struct armwave_yuv_t yuv;
     
