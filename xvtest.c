@@ -35,7 +35,7 @@ extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShm
 void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out)
 {
     yuv_out->y =  16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
-    yuv_out->u = 128 - (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
+    yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
     yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
     
     printf("RGB:%d,%d,%d  YUV:%d,%d,%d\n", rgb_in->r, rgb_in->g, rgb_in->b, yuv_out->y, yuv_out->u, yuv_out->v);
