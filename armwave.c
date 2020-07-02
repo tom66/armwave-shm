@@ -159,14 +159,12 @@ void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct arm
 {
     int length;
     uint32_t *data_y, *data_u, *data_v;
-    uint32_t y_nmask, u_nmask, v_nmask;
+    uint32_t y_nmask, uv_nmask;
     uint32_t y_omask, u_omask, v_omask;
     
-    // Compute the masks for writing the pixel value
+    // Compute the masks for writing the Y pixel value
     y_nmask = ~(0x000000ff << ((x & 3) * 8));
     y_omask =  (yuv->y     << ((x & 3) * 8));
-    
-    printf("%08x %08x\n", y_nmask, y_omask);
     
     // Find the X-address for the first pixel starting at y0.  Increment by the width for each write.
     data_y = (uint32_t*)(img->data + (img->width * y0) + (x & ~0x03));
@@ -176,6 +174,10 @@ void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct arm
         *data_y |= y_omask;
         data_y += img->width / 4;
     }
+    
+    // Compute the masks for writing the UV pixel value
+    uv_nmask = ~(0x000000ff << (((x / 2) & 1) * 8));
+    printf("%08x %08x\n", y_nmask, uv_nmask);
 }
 
 /*
