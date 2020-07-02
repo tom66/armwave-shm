@@ -298,29 +298,29 @@ int main (int argc, char* argv[]) {
   
   while (1) {
     frames = secsa = secsb = 0;
-    //time(&secsa);
-    
-    for (i = 0; i < yuv_image->height; i++) {
-      for (j = 0; j < yuv_image->width; j += 1) {
-        yuv_image->data[yuv_image->width*i + j] = i + frames;  
-        yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + frames;  
+    time(&secsa);
+    while (frames < 200) {	
+      for (i = 0; i < yuv_image->height; i++) {
+        for (j = 0; j < yuv_image->width; j += 1) {
+          yuv_image->data[yuv_image->width*i + j] = i + frames;  
+          yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + frames;  
+        }
       }
+    
+      num += 1;
+      XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
+      
+      XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
+		    0, 0, yuv_image->width, yuv_image->height,
+		    0, 0, _w, _h, True);
+      
+      /* XFlush(dpy); */
+      
+      frames++;
+      printf("num=%d\n", num & 0xff);
     }
-    
-    num += 1;
-    XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
-    
-    XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
-	   0, 0, yuv_image->width, yuv_image->height,
-	   0, 0, _w, _h, True);
-      
-    /* XFlush(dpy); */
-     
-    frames++;
-    printf("num=%d\n", num & 0xff);
-      
-    //time(&secsb);
-    //printf("%ld frames in %ld seconds; %.4f fps\n", frames, secsb-secsa, (double) frames/(secsb-secsa));
+    time(&secsb);
+    printf("%ld frames in %ld seconds; %.4f fps\n", frames, secsb-secsa, (double) frames/(secsb-secsa));
   }
   
   return 0;
