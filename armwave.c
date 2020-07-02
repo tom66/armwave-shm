@@ -187,9 +187,6 @@ void armwave_fill_xvimage_scaled(XvImage *img)
 
     //printf("output buffer: 0x%08x\n", out_buffer);
 
-    if(out_buffer == NULL)
-        return;
-
     npix = g_armwave_state.target_width * g_armwave_state.bitdepth_height; 
     
     //printf("memset %d bytes, npix %d, chbuff sz %d, base32_ptr 0x%08x, dest_buffer 0x%08x, stack ~0x%08x\n", \
