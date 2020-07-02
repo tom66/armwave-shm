@@ -859,15 +859,17 @@ int main()
         
         for (i = 0; i < yuv_image->height; i += 1) {
             for (j = 0; j < yuv_image->width; j += 1) {
+                /*
                 rgb_col.r = i + num;
                 rgb_col.g = j + num;
                 rgb_col.b = num;
                 rgb2yuv(&rgb_col, &yuv_col);
+                */
                 
                 //yuv_col.y = num;
                 //yuv_col.u = i;
                 //yuv_col.v = j;
-                plot_pixel_yuv(yuv_image, j, i, &yuv_col);
+                plot_pixel_yuv(yuv_image, j, i, &yuv_lut[i & 0xff]);
                 //yuv_image->data[yuv_image->width*i + j] = i + num;    
                 //yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;    
             }
