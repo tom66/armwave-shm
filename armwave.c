@@ -136,8 +136,6 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
         printf("3:%d,%d\n", x0, y);
         *data_y++ = yword;
         *data_y++ = yword;
-        *data_y++ = yword;
-        *data_y++ = yword;
         *data_u++ = uword;
         *data_v++ = vword;
     }
