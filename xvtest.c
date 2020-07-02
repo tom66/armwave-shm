@@ -297,8 +297,8 @@ int main (int argc, char* argv[]) {
   printf("%d\n", yuv_image->data_size);
   
   while (1) {
-    frames = secsa = secsb = 0;
-    time(&secsa);
+    //frames = secsa = secsb = 0;
+    //time(&secsa);
     
     for (i = 0; i < yuv_image->height; i++) {
       for (j = 0; j < yuv_image->width; j += 1) {
@@ -319,8 +319,8 @@ int main (int argc, char* argv[]) {
     //num++;
     // printf("num=%d\n", num & 0xff);
       
-    time(&secsb);
-    printf("%ld frames in %ld seconds; %.4f fps\n", frames, secsb-secsa, (double) frames/(secsb-secsa));
+    //time(&secsb);
+    //printf("%ld frames in %ld seconds; %.4f fps\n", frames, secsb-secsa, (double) frames/(secsb-secsa));
   }
   
   return 0;
