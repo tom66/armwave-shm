@@ -158,26 +158,21 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
 void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *yuv)
 {
     int length;
-    uint32_t *data_y, *data_u, *data_v;
-    uint32_t y_nmask, uv_nmask;
-    uint32_t y_omask, u_omask, v_omask;
-    
-    // Compute the masks for writing the Y pixel value
-    y_nmask = ~(0x000000ff << ((x & 3) * 8));
-    y_omask =  (yuv->y     << ((x & 3) * 8));
+    uint8_t *data_y, *data_u, *data_v;
     
     // Find the X-address for the first pixel starting at y0.  Increment by the width for each write.
-    data_y = (uint32_t*)(img->data + (img->width * y0) + (x & ~0x03));
+    data_y = (uint8_t*)(img->data + (img->width * y0) + (x & ~0x03));
     
     for(length = y1 - y0; length > 0; length--, y0++) {
-        *data_y &= y_nmask;
-        *data_y |= y_omask;
-        data_y += img->width / 4;
+        *data_y = yuv.y;
+        data_y += img->width;
     }
     
     // Compute the masks for writing the UV pixel value
+    /*
     uv_nmask = ~(0x000000ff << (((x / 2) & 1) * 8));
     printf("%08x %08x\n", y_nmask, uv_nmask);
+    */
 }
 
 /*
