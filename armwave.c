@@ -945,7 +945,7 @@ int main()
         armwave_fill_xvimage_scaled(yuv_image);
         
         for(j = 0; j < (yuv_image->height - 16); j += 16) {
-            printf("Render line %d", j);
+            printf("Render line %d\n", j);
             draw_horiz_line_fast_rgb_xvimage(yuv_image, 0, yuv_image->width, j, &grat_col);
         } 
 
