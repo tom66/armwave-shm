@@ -732,7 +732,7 @@ int main()
     armwave_setup_render(0, 1024, 256, 1024, 1024, 256, 0);
     armwave_set_channel_colour(1, 2550, 1780, 250);
     armwave_prep_yuv_palette(0, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
-    armwave_test_create_am_sine(0.5, 1e-4, n_test_waves);
+    armwave_test_create_am_sine(0.5, 3e-5, n_test_waves);
     printf("Done, starting XVideo...\n");
     
     /*
