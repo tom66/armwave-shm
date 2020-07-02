@@ -47,8 +47,8 @@ void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
     
     img->data[(img->width * y) + x] = yuv_in->y; 
     
-    img->data[yuv_image->offsets[1] + (((img->width * y) + x) / 2)] = yuv_in->v;
-    img->data[yuv_image->offsets[2] + (((img->width * y) + x) / 2)] = yuv_in->u;
+    img->data[img->offsets[1] + (((img->width * y) + x) / 2)] = yuv_in->v;
+    img->data[img->offsets[2] + (((img->width * y) + x) / 2)] = yuv_in->u;
 }
 
 int main (int argc, char* argv[]) {
