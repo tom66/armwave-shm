@@ -632,7 +632,7 @@ void armwave_cleanup()
 
 /*
  * Main entry point for the testcase.  Based on:
- * http://www6.uniovi.es/cscene/CS8/xlib-4.c
+ * http://bellet.info/XVideo/testxv.c
  */
 #ifdef NO_PYTHON
 int main()
@@ -641,7 +641,7 @@ int main()
     int	yuv_height = 256;
     
     int	xv_port = -1;
-    int	adaptor, encodings, attributes, formats;
+    int	adaptor = -1, encodings, attributes, formats;
     int	i, j, ret, p, _d, _w, _h, n;
     long secsb, secsa, frames;
     
@@ -663,7 +663,6 @@ int main()
     unsigned long mask;
     XEvent event;
     GC gc;
-    
     int shmem_flag = 0;
     XShmSegmentInfo	yuv_shminfo;
     int	CompletionType;
@@ -681,17 +680,28 @@ int main()
     
     printf("Starting up testapp...\n\n");
     
-    adaptor = -1;
-	
+    /*
+     * Try to open the display.
+     */
     dpy = XOpenDisplay(NULL);
     if (dpy == NULL) {
-        printf("Cannot open Display.\n");
+        printf("Cannot open display.\n");
         exit (-1);
     }
     
     screen = DefaultScreen(dpy);
     
-    /** find best display */
+    /*
+     * Set up the renderer.
+     */
+    printf("Preparing test waveforms...\n");
+    armwave_setup_render(0, 1024, 256, 1024, 1024, 256, 0);
+    armwave_test_create_am_sine(0.5, 1e-6, 128);
+    printf("Done, starting XVideo...\n");
+    
+    /*
+     * Check the display supports 24-bit TrueColor, if not then abort early.
+     */
     if (XMatchVisualInfo(dpy, screen, 24, TrueColor, &vinfo)) {
         printf("Found 24bit TrueColor.\n");
     } else {
