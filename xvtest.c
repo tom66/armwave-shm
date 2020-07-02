@@ -55,8 +55,8 @@ void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
 }
 
 int main (int argc, char* argv[]) {
-  int		yuv_width = 1800;
-  int		yuv_height = 1000;
+  int		yuv_width = 1024;
+  int		yuv_height = 256;
   
   int		xv_port = -1;
   int		adaptor, encodings, attributes, formats;
