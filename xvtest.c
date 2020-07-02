@@ -333,6 +333,15 @@ int main (int argc, char* argv[]) {
     //frames = secsa = secsb = 0;
     //time(&secsa);
     
+    for(i = 0; i < 255; i++) {
+      rgb_col.r = i;
+      rgb_col.g = i;
+      rgb_col.b = i;
+      rgb2yuv(&rgb_col, &yuv_col);
+    }
+    
+    exit(-1) ;
+    
     for (i = 0; i < yuv_image->height; i += 1) {
       for (j = 0; j < yuv_image->width; j += 1) {
         rgb_col.r = i;
