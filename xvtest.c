@@ -347,8 +347,8 @@ int main (int argc, char* argv[]) {
     for (i = 0; i < yuv_image->height; i += 1) {
       for (j = 0; j < yuv_image->width; j += 1) {
         rgb_col.r = 0;
-        rgb_col.g = i;
-        rgb_col.b = 0;
+        rgb_col.g = 0;
+        rgb_col.b = i;
         rgb2yuv(&rgb_col, &yuv_col);
         
         //yuv_col.y = num;
