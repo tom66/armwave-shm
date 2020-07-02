@@ -18,15 +18,37 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XShm.h>
 
+struct yuv_t {
+    uint8_t y, u, v;
+};
+
+struct rgb_t {
+    uint8_t r, g, b;
+};
 
 extern int 	XShmQueryExtension(Display*);
 extern int 	XShmGetEventBase(Display*);
 extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShmSegmentInfo*);
 
-void put_pixel(char* data, int x, int y, int maxx, int p) {
-  data[y*maxx + x] = p;
+void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out)
+{
+    yuv_out->y = ( 0.257f * rgb_in->r) + (0.504f * rgb_in->g) + (0.098f * rgb_in->b) +  16;
+    yuv_out->u = (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b) + 128;
+    yuv_out->v = ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b) + 128;
 }
-	
+
+void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
+{
+    int uv_base = yuv_image->width * yuv_image->height;
+    
+    yuv_image->data[(yuv_image->width * y) + x] = yuv_in->y; 
+    
+    if(x & 1) {
+        yuv_image->data[uv_base + ((yuv_image->width * y) / 2) + (x / 2) + 0] = yuv_in->u;  
+    } else {
+        yuv_image->data[uv_base + ((yuv_image->width * y) / 2) + (x / 2) + 1] = yuv_in->v;  
+    }
+}
 
 int main (int argc, char* argv[]) {
   int		yuv_width = 1800;
@@ -69,6 +91,11 @@ int main (int argc, char* argv[]) {
   
   int p_num_formats;
   XvImageFormatValues *img_fmts;
+  
+  struct yuv_t yuv_col;
+  yuv_col.y = 255;
+  yuv_col.u = 127;
+  yuv_col.v = 127;
   
   printf("starting up video testapp...\n\n");
   
@@ -300,10 +327,14 @@ int main (int argc, char* argv[]) {
     //frames = secsa = secsb = 0;
     //time(&secsa);
     
-    for (i = 0; i < yuv_image->height; i += 10) {
-      for (j = 0; j < yuv_image->width; j += 10) {
-        yuv_image->data[yuv_image->width*i + j] = i + num;  
-        yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;  
+    for (i = 0; i < yuv_image->height; i += 1) {
+      for (j = 0; j < yuv_image->width; j += 1) {
+        yuv_col.y = num;
+        yuv_col.u = i;
+        yuv_col.v = j;
+        plot_pixel_yuv(yuv_image, i, j, &yuv_col);
+        //yuv_image->data[yuv_image->width*i + j] = i + num;  
+        //yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;  
       }
     }
     
