@@ -99,6 +99,8 @@ int main (int argc, char* argv[]) {
   yuv_col.u = 127;
   yuv_col.v = 127;
   
+  struct rgb_t rgb_col;
+  
   printf("starting up video testapp...\n\n");
   
   adaptor = -1;
@@ -331,9 +333,14 @@ int main (int argc, char* argv[]) {
     
     for (i = 0; i < yuv_image->height; i += 1) {
       for (j = 0; j < yuv_image->width; j += 1) {
-        yuv_col.y = num;
-        yuv_col.u = i;
-        yuv_col.v = j;
+        rgb_col.r = i;
+        rgb_col.g = j;
+        rgb_col.b = num;
+        rgb2yuv(&rgb_col, &yuv_col);
+        
+        //yuv_col.y = num;
+        //yuv_col.u = i;
+        //yuv_col.v = j;
         plot_pixel_yuv(yuv_image, j, i, &yuv_col);
         //yuv_image->data[yuv_image->width*i + j] = i + num;  
         //yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;  
