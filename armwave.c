@@ -465,8 +465,6 @@ void armwave_dump_ppm_debug(uint32_t *buffer, char *fn)
  */
 void armwave_test_init(int wave_size, int nwaves, int render_width, int render_height)
 {
-    test_create_gamma();
-
     // make ch1 yellowish by default
     armwave_set_channel_colour(1, 2550, 1780, 250);
 
