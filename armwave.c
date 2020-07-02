@@ -725,8 +725,8 @@ int main()
 			 vinfo.visual,
 			 mask, &xswa);
     
-    XStoreName(dpy, window, "firstxv");
-    XSetIconName(dpy, window, "firstxv");
+    XStoreName(dpy, window, "ArmWave");
+    XSetIconName(dpy, window, "ArmWave");
     XSelectInput(dpy, window, StructureNotifyMask);
     
     XMapWindow(dpy, window);
