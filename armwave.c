@@ -125,9 +125,9 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
     data_v = (uint32_t*)(img->offsets[1] + (img->pitches[1] * (y / 2)) + (x0 / 2));
     data_u = (uint32_t*)(img->offsets[2] + (img->pitches[1] * (y / 2)) + (x0 / 2));
     
-    yword = yuv.y * 0x01010101;
-    uword = yuv.u * 0x01010101;
-    vword = yuv.v * 0x01010101;
+    yword = yuv->y * 0x01010101;
+    uword = yuv->u * 0x01010101;
+    vword = yuv->v * 0x01010101;
     
     for(length = (x1 - x0); length > 4; length -= 4, x0 += 4) {
         *data_y++ = yword;
