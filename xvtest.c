@@ -41,14 +41,14 @@ void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out)
 
 void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
 {
-    int uv_base = yuv_image->width * yuv_image->height;
+    int uv_base = img->width * img->height;
     
-    yuv_image->data[(yuv_image->width * y) + x] = yuv_in->y; 
+    img->data[(img->width * y) + x] = yuv_in->y; 
     
     if(x & 1) {
-        yuv_image->data[uv_base + ((yuv_image->width * y) / 2) + (x / 2) + 0] = yuv_in->u;  
+        img->data[uv_base + ((img->width * y) / 2) + (x / 2) + 0] = yuv_in->u;  
     } else {
-        yuv_image->data[uv_base + ((yuv_image->width * y) / 2) + (x / 2) + 1] = yuv_in->v;  
+        img->data[uv_base + ((img->width * y) / 2) + (x / 2) + 1] = yuv_in->v;  
     }
 }
 
