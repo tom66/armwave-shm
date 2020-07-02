@@ -29,7 +29,7 @@ void put_pixel(char* data, int x, int y, int maxx, int p) {
 	
 
 int main (int argc, char* argv[]) {
-  int		yuv_width = 1000;
+  int		yuv_width = 1800;
   int		yuv_height = 1000;
   
   int		xv_port = -1;
