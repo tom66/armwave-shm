@@ -81,9 +81,9 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
     switch(palette) {
         case 0:
             for(v = 0; v < 255; v++) {
-                temp.r = MIN((color0->r * value) >> 8, 255);
-                temp.g = MIN((color0->g * value) >> 8, 255);
-                temp.b = MIN((color0->b * value) >> 8, 255);
+                temp.r = MIN((color0->r * v) >> 8, 255);
+                temp.g = MIN((color0->g * v) >> 8, 255);
+                temp.b = MIN((color0->b * v) >> 8, 255);
                 rgb2yuv(&temp, &yuv_lut[v]); 
             }
             break;
