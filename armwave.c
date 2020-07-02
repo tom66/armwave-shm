@@ -953,8 +953,8 @@ int main()
         XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
         XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
-	     0, 0, yuv_image->width, yuv_image->height,
-	     0, 0, _w, _h, True);
+            0, 0, yuv_image->width, yuv_image->height,
+            0, 0, _w, _h, True);
             
         /* XFlush(dpy); */
          
