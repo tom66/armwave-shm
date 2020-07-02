@@ -132,19 +132,23 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
     uword = yuv->u * 0x01010101;
     vword = yuv->v * 0x01010101;
     
-    for(length = (x1 - x0) / 2; length > 4; length -= 4, x0 += 4) {
+    for(length = (x1 - x0) / 2; length > 4; length -= 4, x0 += 8) {
         printf("3:%d,%d\n", x0, y);
+        *data_y++ = yword;
+        *data_y++ = yword;
+        *data_y++ = yword;
         *data_y++ = yword;
         *data_u++ = uword;
         *data_v++ = vword;
     }
     
+    /*
     for(length = (x1 - x0) / 2; length > 4; length -= 4, x0 += 4) {
         printf("4:%d,%d\n", x0, y);
-        *data_y++ = yword;
         //*data_u++ = uword;
         //*data_v++ = vword;
     }
+    */
     
     // Write remaining pixels until length is zero
     while(length > 0) {
