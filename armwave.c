@@ -470,7 +470,7 @@ void armwave_test_init(int wave_size, int nwaves, int render_width, int render_h
  */
 void armwave_test_fill_outbuf()
 {
-    armwave_fill_pixbuf_scaled(g_armwave_state.out_pixbuf);
+    //armwave_fill_pixbuf_scaled(g_armwave_state.out_pixbuf);
 }
 
 /*
@@ -494,7 +494,7 @@ void armwave_test_fill_gdkbuf(PyObject *buf)
     void *out_pixbuf = ((uint32_t ***)buf)[2][10];
     
     // TODO: use armwave_fill_pixbuf_256 for 256-height buffers for performance?
-    armwave_fill_pixbuf_scaled(out_pixbuf);
+    //armwave_fill_pixbuf_scaled(out_pixbuf);
 }
 #endif
 
@@ -538,7 +538,7 @@ PyObject *armwave_fill_pixbuf_into_pybuffer(PyObject *buf_obj)
 
     //printf("PyObject_GetBuffer did not trigger assert: buffer->buf=0x%08x, buffer->obj=0x%08x, buffer->len=%d\n", buffer->buf, buffer->obj, buffer->len);
 
-    armwave_fill_pixbuf_scaled(buffer.buf);
+    //armwave_fill_pixbuf_scaled(buffer.buf);
     //printf("armwave_fill_pixbuf_into_pybuffer: buffer fill done\n");
 
     PyBuffer_Release(&buffer);
