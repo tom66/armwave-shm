@@ -42,19 +42,55 @@
 #define ARMWAVE_VER  "v0.0.1"
 
 struct armwave_state_t g_armwave_state;
-
-uint8_t gamma_table[256];
+struct armwave_yuv_t yuv_lut[256];
 
 /*
- * Create a gamma table.
+ * Helper function to convert 8-bit RGB to 8-bit YUV values.
  */
-void test_create_gamma()
+void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out)
 {
-    int i;
-    float gamma = 0.90f;
+    yuv_out->y =  16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
+    yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
+    yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
+}
 
-    for(i = 0; i < 256; i++) {
-        gamma_table[i] = pow(i / 255.0f, gamma) * 255.0f;
+/*
+ * Demo/helper function to plot YUV pixel on XvImage canvas.
+ */
+void plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
+{
+    int uv_base = img->width * img->height;
+    
+    img->data[(img->width * y) + x] = yuv_in->y; 
+    img->data[img->offsets[1] + (img->pitches[1] * (y / 2)) + (x / 2)] = yuv_in->v;
+    img->data[img->offsets[2] + (img->pitches[2] * (y / 2)) + (x / 2)] = yuv_in->u;
+}
+
+/*
+ * Prepare the YUV table for a given range of intensities.
+ *
+ * This can be used to generate different palettes. Right now only
+ * the default palette '0' is supported which is linear intensity with
+ * given trace colour.
+ */
+void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, struct armwave_color_mix_t *color1)
+{
+    int v;
+    struct armwave_color_mix_t temp;
+    
+    switch(palette) {
+        case 0:
+            for(v = 0; v < 255; v++) {
+                temp.r = MIN((color0.r * value) >> 8, 255);
+                temp.g = MIN((color0.g * value) >> 8, 255);
+                temp.b = MIN((color0.b * value) >> 8, 255);
+                rgb2yuv(&temp, &yuv_lut[v]); 
+            }
+            break;
+    }
+    
+    for(v = 0; v < 255; v++) {
+        printf("%3d = (%3d, %3d, %3d)\n", v, yuv_lut[v].y, yuv_lut[v].u, yuv_lut[v].v);
     }
 }
 
@@ -670,8 +706,8 @@ int main()
     int p_num_formats;
     XvImageFormatValues *img_fmts;
     
-    struct yuv_t yuv_col;
-    struct rgb_t rgb_col;
+    struct armwave_yuv_t yuv_col;
+    struct armwave_rgb_t rgb_col;
     int num = 0;
     
     yuv_col.y = 255;
@@ -697,6 +733,7 @@ int main()
     printf("Preparing test waveforms...\n");
     armwave_setup_render(0, 1024, 256, 1024, 1024, 256, 0);
     armwave_set_channel_colour(1, 2550, 1780, 250);
+    armwave_prep_yuv_palette(0, g_armwave_state.ch1_color, g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.5, 1e-6, 8);
     printf("Done, starting XVideo...\n");
     
@@ -856,25 +893,3 @@ int main()
     return 0;
 }
 #endif
-
-/*
- * Helper function to convert 8-bit RGB to 8-bit YUV values.
- */
-void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out)
-{
-    yuv_out->y =  16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
-    yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
-    yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
-}
-
-/*
- * Demo/helper function to plot YUV pixel on XvImage canvas.
- */
-void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
-{
-    int uv_base = img->width * img->height;
-    
-    img->data[(img->width * y) + x] = yuv_in->y; 
-    img->data[img->offsets[1] + (img->pitches[1] * (y / 2)) + (x / 2)] = yuv_in->v;
-    img->data[img->offsets[2] + (img->pitches[2] * (y / 2)) + (x / 2)] = yuv_in->u;
-}
