@@ -182,7 +182,7 @@ void armwave_fill_xvimage_scaled(XvImage *img)
     int value; 
     // uint8_t row;
     uint32_t *base_32ptr = (uint32_t*)g_armwave_state.ch1_buffer;
-    uint32_t *out_buffer_base = out_buffer;
+    //uint32_t *out_buffer_base = out_buffer;
     uint32_t offset;
 
     //printf("output buffer: 0x%08x\n", out_buffer);
