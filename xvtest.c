@@ -195,103 +195,10 @@ int main (int argc, char* argv[]) {
         exit(-1);
     }
     
-    printf("=======================================\n");
-    printf("XvQueryAdaptors returned the following:\n");
-    printf("%d adaptors available.\n", p_num_adaptors);
+    // Use the last port available
     for (i = 0; i < p_num_adaptors; i++) {
-        /*
-        printf(" name:                %s\n"
-	     " type:                %s%s%s%s%s\n"
-	     " ports:             %ld\n"
-	     " first port:    %ld\n",
-	     ai[i].name,
-	     (ai[i].type & XvInputMask)	? "input | "	: "",
-	     (ai[i].type & XvOutputMask)	? "output | "	: "",
-	     (ai[i].type & XvVideoMask)	? "video | "	: "",
-	     (ai[i].type & XvStillMask)	? "still | "	: "",
-	     (ai[i].type & XvImageMask)	? "image | "	: "",
-	     ai[i].num_ports,
-	     ai[i].base_id);
-        */
-        
         xv_port = ai[i].base_id;
-        
-        //printf("adaptor %d ; format list:\n", i);
-        for (j = 0; j < ai[i].num_formats; j++) {
-            /*
-            printf(" depth=%d, visual=%ld\n",
-	         ai[i].formats[j].depth,
-	         ai[i].formats[j].visual_id);
-            */
-        }
-        for (p = ai[i].base_id; p < ai[i].base_id+ai[i].num_ports; p++) {
-            
-            //printf(" encoding list for port %d\n", p);
-            if (XvQueryEncodings(dpy, p, &encodings, &ei) != Success) {
-	//printf("XvQueryEncodings failed.\n");
-	continue;
-            }
-            for (j = 0; j < encodings; j++) {
-	printf("    id=%ld, name=%s, size=%ldx%ld, numerator=%d, denominator=%d\n",
-	             ei[j].encoding_id, ei[j].name, ei[j].width, ei[j].height,
-	             ei[j].rate.numerator, ei[j].rate.denominator);
-            }
-            XvFreeEncodingInfo(ei);
-            
-            //printf(" attribute list for port %d\n", p);
-            at = XvQueryPortAttributes(dpy, p, &attributes);
-            for (j = 0; j < attributes; j++) {
-                /*
-                printf("    name:             %s\n"
-                             "    flags:         %s%s\n"
-                             "    min_color:    %i\n"
-                             "    max_color:    %i\n",
-                             at[j].name,
-                             (at[j].flags & XvGettable) ? " get" : "",
-                             (at[j].flags & XvSettable) ? " set" : "",						
-                             at[j].min_value, at[j].max_value);
-                */
-            }
-            if (at)
-	XFree(at);
-            
-            printf(" image format list for port %d\n", p);
-            fo = XvListImageFormats(dpy, p, &formats);
-            for (j = 0; j < formats; j++) {
-                /*
-                printf("    0x%x (%4.4s) %s\n",
-                             fo[j].id,
-                             (char *)&fo[j].id,
-                             (fo[j].format == XvPacked) ? "packed" : "planar");
-                */
-                
-                printf("        4CC: 0x%08x,    type: %d,    byte_order: %d,    bits_per_pixel: %d,    format: %d,    num_planes: %d,    depth: %d, pack:    %s,    order: %s,    ybits: %d,    ubits: %d,    vbits: %d\n", \
-                        fo[j].id, fo[j].type, fo[j].byte_order, fo[j].bits_per_pixel, fo[j].format, fo[j].num_planes, fo[j].depth,    \
-                        (fo[j].format == XvPacked) ? "packed" : "planar", fo[j].component_order, \
-                        fo[j].y_sample_bits, fo[j].u_sample_bits, fo[j].v_sample_bits);
-            }
-            if (fo)
-	XFree(fo);
-        }
-        printf("\n");
     }
-    if (p_num_adaptors > 0)
-        XvFreeAdaptorInfo(ai);
-    if (xv_port == -1)
-        exit (0);
-
-    /*
-    img_fmts = XvListImageFormats(dpy, xv_port, &p_num_formats);
-    
-    printf("XvListImageFormats reports %d formats\n", p_num_formats);
-    
-    for(i = 0; i < p_num_formats; i++) {
-        printf("4CC: 0x%08x,    type: %d,    byte_order: %d,    bits_per_pixel: %d,    format: %d,    num_planes: %d,    depth: %d\n", \
-                img_fmts[i].id, img_fmts[i].type, img_fmts[i].byte_order, img_fmts[i].bits_per_pixel, img_fmts[i].format, img_fmts[i].num_planes, img_fmts[i].depth);
-    }
-    
-    printf("\n\n");
-    */
     
     gc = XCreateGC(dpy, window, 0, 0);		
     
