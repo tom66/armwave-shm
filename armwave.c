@@ -59,7 +59,7 @@ void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out)
 /*
  * Demo/helper function to plot YUV pixel on XvImage canvas.
  */
-void plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in) __attribute__(("always_inline"))
+void plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in) __attribute__((always_inline))
 {
     int uv_base = img->width * img->height;
     
