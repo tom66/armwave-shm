@@ -162,10 +162,16 @@ void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct arm
     
     // Find the X-address for the first pixel starting at y0.  Increment by the width for each write.
     data_y = (uint8_t*)(img->data + (img->width * y0) + x);
+    data_v = (uint8_t*)(img->data + img->offsets[1] + (img->pitches[1] * (y0 / 2)) + (x / 2));
+    data_u = (uint8_t*)(img->data + img->offsets[2] + (img->pitches[2] * (y0 / 2)) + (x / 2));
     
     for(length = y1 - y0; length > 0; length--, y0++) {
         *data_y = yuv->y;
+        *data_u = yuv->u;
+        *data_v = yuv->v;
         data_y += img->width;
+        data_u += img->width / 2;
+        data_v += img->width / 2;
     }
     
     // Compute the masks for writing the UV pixel value
