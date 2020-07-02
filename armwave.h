@@ -114,7 +114,7 @@ void armwave_setup_render(uint32_t start_point, uint32_t end_point, uint32_t wav
 void armwave_set_wave_pointer(uint8_t *wave_buffer);
 void armwave_set_wave_pointer_as_testbuf(int set);
 void armwave_set_wave_pointer_u32(uint32_t wave_buffer_ptr);
-void armwave_set_channel_colour(int ch, int r, int g, int b);
+void armwave_set_channel_colour(int ch, int r, int g, int b, float i);
 void armwave_clear_buffer(uint32_t flags);
 //void armwave_fill_pixbuf_256(uint32_t *out_buffer);
 void armwave_fill_pixbuf_scaled(uint32_t *out_buffer);

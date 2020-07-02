@@ -437,16 +437,17 @@ void armwave_clear_buffer(uint32_t flags)
 }
 
 /*
- * Set the render colour for a channel.  R/G/B may exceed 255 for saturation effects.
+ * Set the render colour for a channel.  R/G/B may exceed 255 for saturation effects.  
+ * `I` sets intensity multiplier for all colours.
  */
-void armwave_set_channel_colour(int ch, int r, int g, int b)
+void armwave_set_channel_colour(int ch, int r, int g, int b, float i)
 {
     // Only 1ch supported for now
     switch(ch) {
         case 1:
-            g_armwave_state.ch1_color.r = r;
-            g_armwave_state.ch1_color.g = g;
-            g_armwave_state.ch1_color.b = b;
+            g_armwave_state.ch1_color.r = r * i;
+            g_armwave_state.ch1_color.g = g * i;
+            g_armwave_state.ch1_color.b = b * i;
             break;
     }
 }
@@ -483,12 +484,6 @@ void armwave_dump_ppm_debug(uint32_t *buffer, char *fn)
  */
 void armwave_test_init(int wave_size, int nwaves, int render_width, int render_height)
 {
-    // make ch1 yellowish by default
-    armwave_set_channel_colour(1, 2550, 1780, 250);
-
-    armwave_setup_render(0, wave_size, nwaves, wave_size, render_width, render_height, 0x00000000);
-
-    printf("armwave version: %s\n", ARMWAVE_VER);
 }
 
 /*
@@ -750,7 +745,7 @@ int main()
      */
     printf("Preparing test waveforms...\n");
     armwave_setup_render(0, 1024, 256, 1024, 1024, 256, 0);
-    armwave_set_channel_colour(1, 25500, 17800, 2500);
+    armwave_set_channel_colour(1, 255, 178, 25, 10.0f);
     armwave_prep_yuv_palette(0, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.25, 1e-5, n_test_waves);
     printf("Done, starting XVideo...\n");
