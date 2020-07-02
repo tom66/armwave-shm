@@ -183,7 +183,7 @@ int main (int argc, char* argv[]) {
     ret = XvQueryExtension(dpy, &p_version, &p_release, &p_request_base,
 			 &p_event_base, &p_error_base);
     if (ret != Success) {
-        printf("Error: Fatal: Unable to find XVideo extension.  Is it configured correctly?\n\n");
+        printf("Error: Fatal: Unable to find XVideo extension (%d).  Is it configured correctly?\n\n", ret);
         exit(-1);
     }
     
@@ -191,14 +191,10 @@ int main (int argc, char* argv[]) {
 			&p_num_adaptors, &ai);
     
     if (ret != Success) {
-        if (ret == XvBadExtension)
-            printf("XvBadExtension returned at XvQueryExtension.\n");
-        else
-            if (ret == XvBadAlloc)
-	printf("XvBadAlloc returned at XvQueryExtension.\n");
-            else
-	printf("other error happaned at XvQueryAdaptors.\n");
+        printf("Error: Fatal: Unable to query XVideo extension (%d).  Is it configured correctly?\n\n", ret);
+        exit(-1);
     }
+    
     printf("=======================================\n");
     printf("XvQueryAdaptors returned the following:\n");
     printf("%d adaptors available.\n", p_num_adaptors);
