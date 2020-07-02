@@ -45,12 +45,14 @@ void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
 {
     int uv_base = img->width * img->height;
     
+#if 0
     printf("%d,%d %d %d %d\n", \
         x, y, 
         (img->width * y) + x, \
         img->offsets[1] + (img->pitches[1] * y) + (x / 2), \
         img->offsets[2] + (img->pitches[2] * y) + (x / 2));
-    
+#endif
+
     img->data[(img->width * y) + x] = yuv_in->y; 
     img->data[img->offsets[1] + (img->pitches[1] * y) + (x / 2)] = yuv_in->v;
     //img->data[img->offsets[2] + (img->pitches[2] * y) + (x / 2)] = yuv_in->u;
