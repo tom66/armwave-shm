@@ -772,7 +772,7 @@ int main()
     
     xswa.colormap =  XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
-    xswa.background_pixel = 0;
+    xswa.background_pixel = 0x80808080;
     xswa.border_pixel = 0;
     
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
