@@ -173,7 +173,7 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
 /*
  * Render buffer to an XvImage canvas.
  */
-void armwave_fill_pixbuf_scaled(XvImage *img)
+void armwave_fill_xvimage_scaled(XvImage *img)
 {
     uint32_t xx, yy, ye, y, word, wave_word, painted = 0;
     // uint32_t ysub;
@@ -863,7 +863,8 @@ int main()
                 //yuv_col.y = num;
                 //yuv_col.u = i;
                 //yuv_col.v = j;
-                plot_pixel_yuv(yuv_image, j, i, &yuv_lut[i & 0xff]);
+                //plot_pixel_yuv(yuv_image, j, i, &yuv_lut[i & 0xff]);
+                armwave_fill_xvimage_scaled(yuv_image);
                 //yuv_image->data[yuv_image->width*i + j] = i + num;    
                 //yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;    
             }
