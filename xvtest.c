@@ -323,7 +323,7 @@ int main (int argc, char* argv[]) {
   yuv_shminfo.readOnly = False;
   
   for(n = 0; n < yuv_image->num_planes; n++) {
-    printf("yuv_image plane %d pitch %d offset %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
+    printf("yuv_image plane %d offset %d pitch %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
   }
   
   if (!XShmAttach(dpy, &yuv_shminfo)) {
