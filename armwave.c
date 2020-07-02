@@ -121,6 +121,8 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
         x0++;
     }
     
+    printf("2:%d,%d\n", x0, y);
+        
     // Write the bulk of pixels using a loop writing 32 bits at a time.
     data_y = (uint32_t*)((img->width * y) + x0);
     data_v = (uint32_t*)(img->offsets[1] + (img->pitches[1] * (y / 2)) + (x0 / 2));
