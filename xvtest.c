@@ -34,9 +34,9 @@ extern XvImage  *XvShmCreateImage(Display*, XvPortID, int, char*, int, int, XShm
 
 void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out)
 {
-    yuv_out->y = ( 0.257f * rgb_in->r) + (0.504f * rgb_in->g) + (0.098f * rgb_in->b) +  16;
-    yuv_out->u = (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b) + 128;
-    yuv_out->v = ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b) + 128;
+    yuv_out->y =  16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
+    yuv_out->u = 128 - (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
+    yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
 }
 
 void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
