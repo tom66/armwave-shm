@@ -167,9 +167,12 @@ void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct arm
     
     for(length = (y1 - y0) / 2; length > 0; length--, y0++) {
         *data_y = yuv->y;
+        data_y += img->width;
+        *data_y = yuv->y;
+        data_y += img->width;
+        
         *data_u = yuv->u;
         *data_v = yuv->v;
-        data_y += img->width;
         data_u += img->width / 2;
         data_v += img->width / 2;
     }
