@@ -116,7 +116,7 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
     
     // Write pixels until x0 becomes multiple of 4
     while(x0 & 3) {
-        plot_pixel_yuv(img, x0, y, yuv);
+        //plot_pixel_yuv(img, x0, y, yuv);
         printf("%d,%d\n", x0, y);
         x0++;
     }
