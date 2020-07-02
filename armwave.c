@@ -140,14 +140,6 @@ void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct ar
         *data_v++ = vword;
     }
     
-    /*
-    for(length = (x1 - x0) / 2; length > 4; length -= 4, x0 += 4) {
-        printf("4:%d,%d\n", x0, y);
-        //*data_u++ = uword;
-        //*data_v++ = vword;
-    }
-    */
-    
     // Write remaining pixels until length is zero
     while(length > 0) {
         printf("5:%d,%d\n", x0, y);
@@ -796,7 +788,7 @@ int main()
     
     grat_rgb_col.r = 255;
     grat_rgb_col.g = 0;
-    grat_rgb_col.b = 0;
+    grat_rgb_col.b = 255;
     
     rgb2yuv(&grat_rgb_col, &grat_col);
     
