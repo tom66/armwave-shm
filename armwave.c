@@ -994,7 +994,7 @@ int main()
             draw_horiz_line_fast_rgb_xvimage(yuv_image, 0, num % yuv_image->width, j, &grat_rgb_col);
         } 
         
-        for(j = 32; j < yuv_image->height; j += 32) {
+        for(j = 32; j < yuv_image->width; j += 32) {
             printf("Render V-line %d\n", j);
             draw_vert_line_fast_rgb_xvimage(yuv_image, j, 0, num % yuv_image->height, &grat_rgb_col);
         } 
