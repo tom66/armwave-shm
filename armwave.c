@@ -578,7 +578,7 @@ PyObject *armwave_fill_pixbuf_into_pybuffer(PyObject *buf_obj)
  * Make a test AM waveform for render tests.
  *
  * @param   mod                     modulation depth
- * @param   noise_fraction          typically 1e-6
+ * @param   noise_fraction          typically 1e-6`
  * @param   number of wave sets     1-N, must have memory for these
  */
 void armwave_test_create_am_sine(float mod, float noise_fraction, int sets)
@@ -597,7 +597,7 @@ void armwave_test_create_am_sine(float mod, float noise_fraction, int sets)
     
         for(w = 0; w < g_armwave_state.waves; w++) {
             //mod_val = 0.5f + (((float)w / g_armwave_state.waves) * mod);
-            mod_val = 0.5f + (_1_waves_mod * w);
+            mod_val = 0.25f + (sin((_1_waves_mod * w) * 6.28f) + 1.0f);
 
             for(x = 0; x < g_armwave_state.wave_length; x++) {
                 noise  = ((rand() & 0xffff) * noise_fraction);
@@ -752,7 +752,7 @@ int main()
     armwave_setup_render(0, 1024, 16, 1024, 1024, 256, 0);
     armwave_set_channel_colour(1, 25500, 17800, 2500);
     armwave_prep_yuv_palette(0, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
-    armwave_test_create_am_sine(0.9, 1e-5, n_test_waves);
+    armwave_test_create_am_sine(0.5, 1e-5, n_test_waves);
     printf("Done, starting XVideo...\n");
     
     /*
