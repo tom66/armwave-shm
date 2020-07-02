@@ -230,7 +230,7 @@ void armwave_fill_xvimage_scaled(XvImage *img)
                         //offset = (xx + ((g_armwave_state.target_height - y) * g_armwave_state.target_width)); 
                         //printf("0x%08x,%6d,%6d,%6d,%6d,%4d,%.3f\n", out_buffer_base, offset, xx, y, n, g_armwave_state.target_width, g_armwave_state.vscale_frac);
                         //*(out_buffer_base + offset) = word;
-                        printf("%6d,%6d,%6d\n", xx, yy, value);
+                        //printf("%6d,%6d,%6d\n", xx, yy, value);
                         plot_pixel_yuv(img, xx, yy, &yuv_lut[MIN(value, 255)]);
                         painted++;
                     }
@@ -849,6 +849,9 @@ int main()
         exit(-1) ;
         */
         
+        armwave_fill_xvimage_scaled(yuv_image);
+        
+#if 0
         for (i = 0; i < yuv_image->height; i += 1) {
             for (j = 0; j < yuv_image->width; j += 1) {
                 /*
@@ -862,12 +865,12 @@ int main()
                 //yuv_col.u = i;
                 //yuv_col.v = j;
                 //plot_pixel_yuv(yuv_image, j, i, &yuv_lut[i & 0xff]);
-                armwave_fill_xvimage_scaled(yuv_image);
                 //yuv_image->data[yuv_image->width*i + j] = i + num;    
                 //yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;    
             }
         }
-        
+#endif
+
         num += 1;
         XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
