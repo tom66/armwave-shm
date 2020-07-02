@@ -105,6 +105,10 @@ struct armwave_state_t {
  */
 void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out);
 void plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in);
+
+void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_yuv_t *yuv);
+void draw_horiz_line_fast_rgb_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_rgb_t *rgb);
+
 void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, struct armwave_color_mix_t *color1);
 
 void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height);

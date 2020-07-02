@@ -91,7 +91,7 @@ void __attribute__((always_inline)) plot_pixel_yuv(XvImage *img, int x, int y, s
 /*
  * Fill an XvImage canvas with an RGB value.
  */
-void fill_xvimage(XvImage *img, struct armwave_rgb_t *rgb)
+void fill_rgb_xvimage(XvImage *img, struct armwave_rgb_t *rgb)
 {
     struct armwave_yuv_t yuv;
     
@@ -101,6 +101,57 @@ void fill_xvimage(XvImage *img, struct armwave_rgb_t *rgb)
     memset(img->data + img->offsets[0], yuv.y, img->width * img->height);
     memset(img->data + img->offsets[1], yuv.v, (img->pitches[1] * img->height) / 2);
     memset(img->data + img->offsets[2], yuv.u, (img->pitches[2] * img->height) / 2);
+}
+
+/*
+ * Draw a horizontal line quickly.  Takes advantage of 32-bit writes where possible.
+ *
+ * Colour should be passed as YUV to reduce calculation overhead.  x0 must be less than x1
+ * (behaviour is undefined if this is not the case.)
+ */
+void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_yuv_t *yuv)
+{
+    int length;
+    uint32_t *data_y, *data_u, *data_v, yword, uword, vword;
+    
+    // Write pixels until x0 becomes multiple of 4
+    while(x0 & 3) {
+        plot_pixel_yuv(img, x0, y, yuv);
+        x0++;
+    }
+    
+    // Write the bulk of pixels using a loop writing 32 bits at a time.
+    data_y = (uint32_t*)((img->width * y) + x0);
+    data_v = (uint32_t*)(img->offsets[1] + (img->pitches[1] * (y / 2)) + (x0 / 2));
+    data_u = (uint32_t*)(img->offsets[2] + (img->pitches[1] * (y / 2)) + (x0 / 2));
+    
+    yword = yuv.y * 0x01010101;
+    uword = yuv.u * 0x01010101;
+    vword = yuv.v * 0x01010101;
+    
+    for(length = (x1 - x0); length > 4; length -= 4, x0 += 4) {
+        *data_y++ = yword;
+        *data_u++ = uword;
+        *data_v++ = vword;
+    }
+    
+    // Write remaining pixels until length is zero
+    while(length > 0) {
+        plot_pixel_yuv(img, x0, y, yuv);
+        x0++;
+        length--;
+    }
+}
+
+/*
+ * Fast horizontal line drawing function that supports RGB.
+ */
+void draw_horiz_line_fast_rgb_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_rgb_t *rgb)
+{
+    struct armwave_yuv_t yuv;
+    
+    rgb2yuv(rgb, &yuv);
+    draw_horiz_line_fast_xvimage(img, x0, x1, y, &yuv);
 }
 
 /*
@@ -717,7 +768,9 @@ int main()
     int p_num_formats;
     XvImageFormatValues *img_fmts;
     
+    struct armwave_yuv_t grat_col;
     struct armwave_yuv_t yuv_col;
+    struct armwave_rgb_t grat_rgb_col;
     struct armwave_rgb_t rgb_col;
     int num = 0;
     
@@ -727,7 +780,15 @@ int main()
     yuv_col.u = 127;
     yuv_col.v = 127;
     
+    grat_rgb_col.r = 255;
+    grat_rgb_col.g = 0;
+    grat_rgb_col.b = 0;
+    
+    rgb2yuv(&grat_rgb_col, &grat_col);
+    
     printf("Starting up testapp...\n\n");
+    
+    
     
     /*
      * Try to open the display.
@@ -885,25 +946,9 @@ int main()
         
         armwave_fill_xvimage_scaled(yuv_image);
         
-#if 0
-        for (i = 0; i < yuv_image->height; i += 1) {
-            for (j = 0; j < yuv_image->width; j += 1) {
-                /*
-                rgb_col.r = i + num;
-                rgb_col.g = j + num;
-                rgb_col.b = num;
-                rgb2yuv(&rgb_col, &yuv_col);
-                */
-                
-                //yuv_col.y = num;
-                //yuv_col.u = i;
-                //yuv_col.v = j;
-                //plot_pixel_yuv(yuv_image, j, i, &yuv_lut[i & 0xff]);
-                //yuv_image->data[yuv_image->width*i + j] = i + num;    
-                //yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;    
-            }
-        }
-#endif
+        for(j = 0; j < yuv_image->height; j += 16) {
+            draw_horiz_line_fast_rgb_xvimage(yuv_image, 0, yuv_image->width, j, grat_col);
+        } 
 
         num += 1;
         XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
