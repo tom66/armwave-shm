@@ -47,7 +47,7 @@ struct armwave_yuv_t {
     uint8_t y, u, v;
 };
 
-struct rgb_t {
+struct armwave_rgb_t {
     uint8_t r, g, b;
 };
 
