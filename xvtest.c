@@ -121,32 +121,6 @@ int main (int argc, char* argv[]) {
   
   screen = DefaultScreen(dpy);
   
-  /** find best display */
-  if (XMatchVisualInfo(dpy, screen, 24, TrueColor, &vinfo)) {
-    printf(" found 24bit TrueColor\n");
-  } else
-    if (XMatchVisualInfo(dpy, screen, 16, TrueColor, &vinfo)) {
-      printf(" found 16bit TrueColor\n");
-    } else
-      if (XMatchVisualInfo(dpy, screen, 15, TrueColor, &vinfo)) {
-	printf(" found 15bit TrueColor\n");
-      } else
-  	if (XMatchVisualInfo(dpy, screen, 8, PseudoColor, &vinfo)) {
-	  printf(" found 8bit PseudoColor\n");
-  	} else
-	  if (XMatchVisualInfo(dpy, screen, 8, GrayScale, &vinfo)) {
-	    printf(" found 8bit GrayScale\n");
-	  } else
-	    if (XMatchVisualInfo(dpy, screen, 8, StaticGray, &vinfo)) {
-	      printf(" found 8bit StaticGray\n");
-	    } else
-	      if (XMatchVisualInfo(dpy, screen, 1, StaticGray, &vinfo)) {
-  		printf(" found 1bit StaticGray\n");
-	      } else {
-  		printf("requires 16 bit display\n");
-  		exit (-1);
-	      }
-  
   CompletionType = -1;	
   
   hint.x = 1;
