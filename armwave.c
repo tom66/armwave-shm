@@ -206,7 +206,7 @@ void armwave_fill_xvimage_scaled(XvImage *img)
                 value = wave_word & 0xffff;
                 wave_word >>= 16;
 
-                if(value != 0) {7
+                if(value != 0) {
                     /*
                     rr = (g_armwave_state.ch1_color.r * value) >> 8;
                     gg = (g_armwave_state.ch1_color.g * value) >> 8;
