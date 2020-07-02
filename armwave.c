@@ -72,8 +72,8 @@ enum {
 void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out)
 {
     yuv_out->y =  16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
-    yuv_out->v = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
-    yuv_out->u = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
+    yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
+    yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
 }
 
 /*
@@ -790,7 +790,7 @@ int main()
     grat_rgb_col.g = 0;
     grat_rgb_col.b = 0;
     
-    rgb2yuv(&grat_rgb_col, &grat_col);
+    //rgb2yuv(&grat_rgb_col, &grat_col);
     
     printf("Starting up testapp...\n\n");
     
@@ -953,7 +953,7 @@ int main()
 #if 1
         for(j = 16; j < (yuv_image->height - 16); j += 16) {
             printf("Render line %d\n", j);
-            draw_horiz_line_fast_rgb_xvimage(yuv_image, 0, num % yuv_image->width, j, &grat_col);
+            draw_horiz_line_fast_rgb_xvimage(yuv_image, 0, num % yuv_image->width, j, &grat_rgb_col);
         } 
 #endif
 
