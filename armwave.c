@@ -79,8 +79,8 @@ void fill_xvimage(XvImage *img, struct armwave_rgb_t *rgb)
     rgb2yuv(rgb, &yuv);
     
     memset(img->data + img->offsets[0], yuv.y, img->width * img->height);
-    memset(img->data + img->offsets[1], yuv.v, (img->pitches[1] * img->height) / 4);
-    memset(img->data + img->offsets[2], yuv.u, (img->pitches[2] * img->height) / 4);
+    memset(img->data + img->offsets[1], yuv.v, (img->pitches[1] * img->height) / 2);
+    memset(img->data + img->offsets[2], yuv.u, (img->pitches[2] * img->height) / 2);
 }
 
 /*
