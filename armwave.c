@@ -597,7 +597,7 @@ void armwave_test_create_am_sine(float mod, float noise_fraction, int sets)
     
         for(w = 0; w < g_armwave_state.waves; w++) {
             //mod_val = 0.5f + (((float)w / g_armwave_state.waves) * mod);
-            mod_val = 0.0625f + (sin((_1_waves_mod * w) * 6.28f) + 1.0f);
+            mod_val = 0.25f * (sin((_1_waves_mod * w) * 6.28f) + 1.0f);
 
             for(x = 0; x < g_armwave_state.wave_length; x++) {
                 noise  = ((rand() & 0xffff) * noise_fraction);
