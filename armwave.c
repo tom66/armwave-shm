@@ -788,7 +788,7 @@ int main()
     
     grat_rgb_col.r = 255;
     grat_rgb_col.g = 0;
-    grat_rgb_col.b = 255;
+    grat_rgb_col.b = 0;
     
     rgb2yuv(&grat_rgb_col, &grat_col);
     
