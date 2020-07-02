@@ -38,7 +38,15 @@
 typedef uint16_t bufftyp_t;
 
 struct armwave_color_mix_t {
-  int16_t r, g, b;
+    int16_t r, g, b;
+};
+
+struct yuv_t {
+    uint8_t y, u, v;
+};
+
+struct rgb_t {
+    uint8_t r, g, b;
 };
 
 struct armwave_state_t {
@@ -126,3 +134,6 @@ void armwave_test_dump_buffer_to_ppm(char *fn);
 
 void armwave_generate(void);
 void armwave_cleanup(void);
+
+void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out);
+void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in);

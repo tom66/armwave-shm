@@ -628,166 +628,232 @@ void armwave_cleanup()
  * http://www6.uniovi.es/cscene/CS8/xlib-4.c
  */
 #ifdef NO_PYTHON
-int mitshm_error_handler(Display *d, XErrorEvent *ev) 
-{
-    printf("armwave: error: X11: MIT-SHM error (0x%08x, 0x%08x) - fatal\n", d, ev);
-    exit(-1);
-    return 0;
-}
-
-void paint_buffer(XImage *img, int width, int height, int offs)
-{
-    int x, y, ptr_offs;
-    
-    printf("paint_buffer(%d)\r\n", offs);
-
-    for(y = 0; y < height; y++) {
-        //printf("armwave: paint at row %d, stride %d\n", y, img->bytes_per_line);
-        ptr_offs = y * img->bytes_per_line;
-        
-        for(x = 0; x < width; x++) {
-            *(img->data + ptr_offs + 0) = 0xff;
-            *(img->data + ptr_offs + 1) = x + offs;
-            *(img->data + ptr_offs + 2) = y + offs;
-            *(img->data + ptr_offs + 3) = x + y + offs;
-            ptr_offs += 4;
-        }
-    }
-}
-
 int main()
 {
-    int mitshm_major_code;
-    int mitshm_minor_code;
-    Display *d;
-    XVisualInfo vis, *vlist;
+    int	yuv_width = 1024;
+    int	yuv_height = 256;
+    
+    int	xv_port = -1;
+    int	adaptor, encodings, attributes, formats;
+    int	i, j, ret, p, _d, _w, _h, n;
+    long secsb, secsa, frames;
+    
+    XvAdaptorInfo *ai;
+    XvEncodingInfo *ei;
+    XvAttribute	*at;
+    XvImageFormatValues	*fo;
+    XvImage	*yuv_image;
+
+    unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
+    int	p_num_adaptors;
+     	
+    Display	*dpy;
+    Window	window, _dw;
+    XSizeHints hint;
+    XSetWindowAttributes xswa;
+    XVisualInfo	vinfo;
+    int	screen;
+    unsigned long mask;
+    XEvent event;
     GC gc;
-    XShmSegmentInfo shminfo;
-    XImage *img=NULL;
-    XEvent ev;
-    Window win;
     
-    int (*handler)(Display *, XErrorEvent *);
-    int width = 800, height = 600;
-    int x, y;
-    uint32_t ptr_offs;
-    int screen, should_quit = 0;
-    int match;
-    int shared_pixmaps; // unused
+    int shmem_flag = 0;
+    XShmSegmentInfo	yuv_shminfo;
+    int	CompletionType;
     
-    int offs = 0;
-   
-    d = XOpenDisplay(NULL);
-
-    if(!d) {
-        printf("armwave: error: X11: Couldn't open display\n");
-        exit(1);
-    }
-
-    screen = DefaultScreen(d);
-    gc = DefaultGC(d, screen);
+    int p_num_formats;
+    XvImageFormatValues *img_fmts;
     
-    vis.screen = screen;
-    vlist = XGetVisualInfo(d, VisualScreenMask, &vis, &match);
-
-    if(!vlist)  {
-        printf("armwave: error: X11: No visual available?\n");
-        exit(1);
-    }
-
-    vis = vlist[0]; 
-    XFree(vlist);
+    struct yuv_t yuv_col;
+    struct rgb_t rgb_col;
+    int num = 0;
     
-    printf("armwave: visual has %d colours available\n", vis.colormap_size);
-    printf("armwave: visual is type %d\n", vis.class);
+    yuv_col.y = 255;
+    yuv_col.u = 127;
+    yuv_col.v = 127;
     
-    if(vis.class != TrueColor) {
-        printf("armwave: error, colour class not supported (only TrueColor supported.)\n", vis.class);
+    printf("Starting up testapp...\n\n");
+    
+    adaptor = -1;
+	
+    dpy = XOpenDisplay(NULL);
+    if (dpy == NULL) {
+        printf("Cannot open Display.\n");
+        exit (-1);
     }
     
-    if(XShmQueryVersion(d, &mitshm_major_code, &mitshm_minor_code, &shared_pixmaps)) {
-        int (*handler)(Display *, XErrorEvent *);
-        
-        printf("armwave: starting to create MIT-SHM object (SHMver: %d.%d)\n", mitshm_major_code, mitshm_minor_code);
-        
-        img = XShmCreateImage(d, vis.visual,
-                              vis.depth, XShmPixmapFormat(d),
-                              NULL, &shminfo, width, height);
-                              
-        printf("armwave: created ShmImage 0x%08x\n", img);
-        
-        shminfo.shmid = shmget(IPC_PRIVATE,
-                               img->bytes_per_line*img->height,
-                               IPC_CREAT|0777);
-                               
-        printf("armwave: got SHMID %d\n", shminfo.shmid);
-        
-        shminfo.shmaddr = img->data = shmat(shminfo.shmid, 0, 0);
-
-        printf("armwave: got SHM addr 0x%08x\n", shminfo.shmaddr);
-        
-        handler = XSetErrorHandler(mitshm_error_handler);
-        XShmAttach(d, &shminfo); /* Tell the server to attach */
-        XSync(d, 0);
-        XSetErrorHandler(handler);
-
-        printf("armwave: error handler set\n");
-        
-        shmctl(shminfo.shmid, IPC_RMID, 0);
-
-        /*
-        if(!can_use_mitshm)
-        {
-            shmdt(shminfo.shmaddr);
-            img = NULL;
-        }
-        */
-        printf("armwave: MIT-SHM initialised: %d.%d\n", mitshm_major_code, mitshm_minor_code);
+    screen = DefaultScreen(dpy);
+    
+    /** find best display */
+    if (XMatchVisualInfo(dpy, screen, 24, TrueColor, &vinfo)) {
+        printf("Found 24bit TrueColor.\n");
     } else {
-        printf("armwave: error, MIT-SHM might not be supported?\n");
+        printf("Error: Fatal X11: not supported 24-bit TrueColor display.\n");
+        exit(-1);
     }
-
-    //printf("armwave: start to paint buffer %d * %d\n", width, height);
     
-    paint_buffer(img, width, height, offs);
-
-    win = XCreateSimpleWindow(d, DefaultRootWindow(d),
-                             0, 0, width, height, 0,
-                             WhitePixel(d, screen),
-                             BlackPixel(d, screen));
-    XSelectInput(d, win, ButtonPressMask|ExposureMask);
-    XMapWindow(d, win);
-
-    printf("Click to terminate\r\n");
-
-    while(!should_quit) {
-        XClearArea(d, win, 0, 0, 1, 1, True);
-        paint_buffer(img, width, height, offs++);
-        XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
+    /*
+     * Create the window and map it, then wait for it to send us a map event.
+     */
+    CompletionType = -1;	
+    hint.x = 1;
+    hint.y = 1;
+    hint.width = yuv_width;
+    hint.height = yuv_height;
+    hint.flags = PPosition | PSize;
+    
+    xswa.colormap =  XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
+    xswa.event_mask = StructureNotifyMask | ExposureMask;
+    xswa.background_pixel = 0;
+    xswa.border_pixel = 0;
+    
+    mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
+    
+    window = XCreateWindow(dpy, DefaultRootWindow(dpy),
+			 0, 0,
+			 yuv_width,
+			 yuv_height,
+			 0, vinfo.depth,
+			 InputOutput,
+			 vinfo.visual,
+			 mask, &xswa);
+    
+    XStoreName(dpy, window, "firstxv");
+    XSetIconName(dpy, window, "firstxv");
+    XSelectInput(dpy, window, StructureNotifyMask);
+    
+    XMapWindow(dpy, window);
+    
+    do {
+        XNextEvent(dpy, &event);
+    }
+    while (event.type != MapNotify || event.xmap.event != window);
+    
+    /*
+     * Query the MITSHM extension - check it is available.
+     */
+    if (XShmQueryExtension(dpy)) {
+        shmem_flag = 1;
+    }
+    
+    if (!shmem_flag) {
+        printf("Error: Fatal X11: Shared memory extension not available or failed to allocate shared memory.\n");
+        exit(-1);
+    }
+    
+    if (shmem_flag == 1) {
+        CompletionType = XShmGetEventBase(dpy) + ShmCompletion;
+    }
+    
+    ret = XvQueryExtension(dpy, &p_version, &p_release, &p_request_base,
+			 &p_event_base, &p_error_base);
+    if (ret != Success) {
+        printf("Error: Fatal X11: Unable to find XVideo extension (%d).  Is it configured correctly?\n", ret);
+        exit(-1);
+    }
+    
+    ret = XvQueryAdaptors(dpy, DefaultRootWindow(dpy),
+			&p_num_adaptors, &ai);
+    
+    if (ret != Success) {
+        printf("Error: Fatal X11: Unable to query XVideo extension (%d).  Is it configured correctly?\n", ret);
+        exit(-1);
+    }
+    
+    // Use the last port available
+    xv_port = ai[p_num_adaptors - 1].base_id;
+    if(xv_port == -1) {
+        printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
+        exit(-1);
+    }
+    
+    gc = XCreateGC(dpy, window, 0, 0);		
+    
+    yuv_image = XvShmCreateImage(dpy, xv_port, GUID_YUV12_PLANAR, 0, yuv_width, yuv_height, &yuv_shminfo);
+    yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
+    yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    yuv_shminfo.readOnly = False;
+    
+    for(n = 0; n < yuv_image->num_planes; n++) {
+        printf("yuv_image plane %d offset %d pitch %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
+    }
+    
+    if (!XShmAttach(dpy, &yuv_shminfo)) {
+        printf("Error: Fatal X11: XShmAttached failed\n", ret);
+        exit (-1);
+    }
+    
+    printf("%d\n", yuv_image->data_size);
+    
+    while (1) {
+        //frames = secsa = secsb = 0;
+        //time(&secsa);
         
-        XNextEvent(d, &ev);
-        
-        switch(ev.type) {
-            case ButtonPress:
-                should_quit = 1;
-                break;
-            
-            case Expose:
-                //paint_buffer(img, width, height, offs++);
-                //XShmPutImage(d, win, gc, img, 0, 0, 0, 0, width, height, True);
-                break;
+        /*
+        for(i = 0; i < 255; i++) {
+            rgb_col.r = i;
+            rgb_col.g = i;
+            rgb_col.b = i;
+            rgb2yuv(&rgb_col, &yuv_col);
         }
         
-        //usleep(166670);
+        exit(-1) ;
+        */
+        
+        for (i = 0; i < yuv_image->height; i += 1) {
+            for (j = 0; j < yuv_image->width; j += 1) {
+                rgb_col.r = i + num;
+                rgb_col.g = j + num;
+                rgb_col.b = num;
+                rgb2yuv(&rgb_col, &yuv_col);
+                
+                //yuv_col.y = num;
+                //yuv_col.u = i;
+                //yuv_col.v = j;
+                plot_pixel_yuv(yuv_image, j, i, &yuv_col);
+                //yuv_image->data[yuv_image->width*i + j] = i + num;    
+                //yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + (j / 2)] = j + num;    
+            }
+        }
+        
+        num += 1;
+        XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
+        
+        XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
+	     0, 0, yuv_image->width, yuv_image->height,
+	     0, 0, _w, _h, True);
+            
+        /* XFlush(dpy); */
+         
+        //num++;
+        printf("num=%d\n", num & 0xff);
+            
+        //time(&secsb);
+        //printf("%ld frames in %ld seconds; %.4f fps\n", frames, secsb-secsa, (double) frames/(secsb-secsa));
     }
-   
-	XShmDetach(d, &shminfo);
-	XDestroyImage(img);	
-    shmdt(shminfo.shmaddr);
     
-    XDestroyWindow(d, win);
-    XCloseDisplay(d);
-   
     return 0;
 }
 #endif
+
+/*
+ * Helper function to convert 8-bit RGB to 8-bit YUV values.
+ */
+void rgb2yuv(struct rgb_t *rgb_in, struct yuv_t *yuv_out)
+{
+    yuv_out->y =  16 + ( 0.256f * rgb_in->r) + (0.504f * rgb_in->g) + (0.097f * rgb_in->b);
+    yuv_out->u = 128 + (-0.148f * rgb_in->r) - (0.291f * rgb_in->g) + (0.439f * rgb_in->b);
+    yuv_out->v = 128 + ( 0.439f * rgb_in->r) - (0.368f * rgb_in->g) - (0.071f * rgb_in->b);
+}
+
+/*
+ * Demo/helper function to plot YUV pixel on XvImage canvas.
+ */
+void plot_pixel_yuv(XvImage *img, int x, int y, struct yuv_t *yuv_in)
+{
+    int uv_base = img->width * img->height;
+    
+    img->data[(img->width * y) + x] = yuv_in->y; 
+    img->data[img->offsets[1] + (img->pitches[1] * (y / 2)) + (x / 2)] = yuv_in->v;
+    img->data[img->offsets[2] + (img->pitches[2] * (y / 2)) + (x / 2)] = yuv_in->u;
+}
