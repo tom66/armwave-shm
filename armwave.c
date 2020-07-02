@@ -230,6 +230,7 @@ void armwave_fill_xvimage_scaled(XvImage *img)
                         //offset = (xx + ((g_armwave_state.target_height - y) * g_armwave_state.target_width)); 
                         //printf("0x%08x,%6d,%6d,%6d,%6d,%4d,%.3f\n", out_buffer_base, offset, xx, y, n, g_armwave_state.target_width, g_armwave_state.vscale_frac);
                         //*(out_buffer_base + offset) = word;
+                        printf("%6d,%6d,%6d\n", xx, yy, value);
                         plot_pixel_yuv(img, xx, yy, &yuv_lut[MIN(value, 255)]);
                         painted++;
                     }
