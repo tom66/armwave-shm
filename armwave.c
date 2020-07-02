@@ -44,6 +44,8 @@
 struct armwave_state_t g_armwave_state;
 struct armwave_yuv_t yuv_lut[256];
 
+const struct armwave_rgb_t fill_black = { 0, 0, 0 };
+
 /*
  * Helper function to convert 8-bit RGB to 8-bit YUV values.
  */
@@ -64,6 +66,21 @@ void plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
     img->data[(img->width * y) + x] = yuv_in->y; 
     img->data[img->offsets[1] + (img->pitches[1] * (y / 2)) + (x / 2)] = yuv_in->v;
     img->data[img->offsets[2] + (img->pitches[2] * (y / 2)) + (x / 2)] = yuv_in->u;
+}
+
+/*
+ * Fill an XvImage canvas with an RGB value.
+ */
+void fill_xvimage(XvImage *img, struct armwave_rgb_t *rgb)
+{
+    struct armwave_yuv_t yuv;
+    
+    // Compute the Y, U and V values, then use memset to block write them
+    rgb2yuv(rgb, &yuv);
+    
+    memset(img->data + img->offsets[0], yuv.y, img->width * img->height);
+    memset(img->data + img->offsets[1], yuv.v, (img->pitches[1] * img->height) / 4);
+    memset(img->data + img->offsets[2], yuv.u, (img->pitches[2] * img->height) / 4);
 }
 
 /*
@@ -195,7 +212,8 @@ void armwave_fill_xvimage_scaled(XvImage *img)
 
     // we don't really want to be doing this if possible;  os.madvise may be a better option
     //memset(out_buffer, 0x00, g_armwave_state.target_width * g_armwave_state.target_height * 4);
-
+    fill_xvimage(img, &fill_black);
+    
     //printf("iter...\n");
 
     for(n = 0; n < npix; n += 2) {
@@ -207,19 +225,6 @@ void armwave_fill_xvimage_scaled(XvImage *img)
                 wave_word >>= 16;
 
                 if(value != 0) {
-                    /*
-                    rr = (g_armwave_state.ch1_color.r * value) >> 8;
-                    gg = (g_armwave_state.ch1_color.g * value) >> 8;
-                    bb = (g_armwave_state.ch1_color.b * value) >> 8;
-
-                    r = MIN(rr, 255);
-                    g = MIN(gg, 255);
-                    b = MIN(bb, 255);
-
-                    // Ensure 100% alpha channel, if it is used
-                    word = 0xff000000 | (b << 16) | (g << 8) | r;
-                    */
-
                     // Plot the pixels
                     nsub = n + w;
                     yy = (nsub & 0xff); // * g_armwave_state.vscale_frac;
