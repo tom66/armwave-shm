@@ -46,6 +46,26 @@ struct armwave_yuv_t yuv_lut[256];
 
 const struct armwave_rgb_t fill_black = { 0, 0, 0 };
 
+struct MwmHints {
+    unsigned long flags;
+    unsigned long functions;
+    unsigned long decorations;
+    long input_mode;
+    unsigned long status;
+};
+
+enum {
+    MWM_HINTS_FUNCTIONS = (1L << 0),
+    MWM_HINTS_DECORATIONS =  (1L << 1),
+
+    MWM_FUNC_ALL = (1L << 0),
+    MWM_FUNC_RESIZE = (1L << 1),
+    MWM_FUNC_MOVE = (1L << 2),
+    MWM_FUNC_MINIMIZE = (1L << 3),
+    MWM_FUNC_MAXIMIZE = (1L << 4),
+    MWM_FUNC_CLOSE = (1L << 5)
+};
+
 /*
  * Helper function to convert 8-bit RGB to 8-bit YUV values.
  */
@@ -781,6 +801,16 @@ int main()
         XNextEvent(dpy, &event);
     }
     while (event.type != MapNotify || event.xmap.event != window);
+    
+    /*
+     * Try to strip decoration from window.
+     */
+    Atom mwmHintsProperty = XInternAtom(dpy, "_MOTIF_WM_HINTS", 0);
+    struct MwmHints hints;
+    hints.flags = MWM_HINTS_DECORATIONS;
+    hints.decorations = 0;
+    XChangeProperty(dpy, window, mwmHintsProperty, mwmHintsProperty, 32,
+            PropModeReplace, (unsigned char *)&hints, 5);
     
     /*
      * Query the MITSHM extension - check it is available.
