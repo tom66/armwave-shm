@@ -30,6 +30,13 @@
 #include <math.h>
 #include <unistd.h>
 
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
+#include <X11/extensions/XShm.h>
+
 #include "armwave.h"
 
 #define ARMWAVE_VER  "v0.0.1"
