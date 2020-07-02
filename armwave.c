@@ -947,10 +947,12 @@ int main()
         
         armwave_fill_xvimage_scaled(yuv_image);
         
+#if 0
         for(j = 0; j < (yuv_image->height - 16); j += 16) {
             printf("Render line %d\n", j);
             draw_horiz_line_fast_rgb_xvimage(yuv_image, 20, 100 /*yuv_image->width*/, j, &grat_col);
         } 
+#endif
 
         num += 1;
         XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
