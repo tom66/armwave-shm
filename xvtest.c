@@ -303,7 +303,7 @@ int main (int argc, char* argv[]) {
       for (i = 0; i < yuv_image->height; i++) {
         for (j = 0; j < yuv_image->width; j += 1) {
           yuv_image->data[yuv_image->width*i + j] = i;  
-          yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + j] = j;  
+          yuv_image->data[(yuv_image->width*yuv_image->height) + ((yuv_image->width*i) / 2) + j] = j + frames;  
         }
       }
     
