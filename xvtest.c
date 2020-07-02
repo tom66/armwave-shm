@@ -21,7 +21,7 @@
 #include <X11/extensions/XShm.h>
 
 struct yuv_t {
-    uint8_t y, u, v;
+    int8_t y, u, v;
 };
 
 struct rgb_t {
