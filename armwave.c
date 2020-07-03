@@ -632,7 +632,7 @@ void armwave_grab_xid(int id)
     
     // Create the GC
     if(g_gc != NULL) {
-        XFreeGC(g_gc);
+        XFreeGC(g_dpy, g_gc);
     }
     g_gc = XCreateGC(g_dpy, g_window, 0, 0);
 }
