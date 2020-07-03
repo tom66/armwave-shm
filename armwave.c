@@ -844,7 +844,7 @@ void armwave_render_graticule()
             for(j = 0; j < n_sub; j++) {
                 q = p + (gr_size * g_armwave_state.subdiv_frac * j);
                 printf("%3d, %3d\n", q, p);
-                XDrawLine(g_dpy, g_window, g_gc, q, (h / 2) + (m / 2), q, (h / 2) + (m / 2) + 8);
+                XDrawLine(g_dpy, g_window, g_gc, q, (h / 2), q, (h / 2) + 8);
             }
         }
     }
