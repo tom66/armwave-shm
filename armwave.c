@@ -887,7 +887,7 @@ int main()
      * Set up the renderer.
      */
     printf("Preparing test waveforms...\n");
-    armwave_setup_render(0, tex_width, 256, tex_width, tex_width, 256, 0);
+    armwave_setup_render(0, tex_width, 128, tex_width, tex_width, 128, 0);
     armwave_set_channel_colour(1, 255, 178, 25, 10.0f);
     armwave_prep_yuv_palette(0, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.25, 1e-5, n_test_waves);
