@@ -322,7 +322,7 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
                     (g_armwave_state.xcoord_to_xpixel[yi] * 256 * sizeof(bufftyp_t));
 #endif
 
-                *(write_buffer + scale_value)++;
+                *(write_buffer + scale_value) += 1;
                 word >>= 8;
             }
         }
