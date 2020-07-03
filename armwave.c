@@ -1022,6 +1022,10 @@ int main()
             0, 0, yuv_image->width, yuv_image->height,
             0, 0, _w / 2, _h, True);
             
+        XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
+            0, 0, yuv_image->width, yuv_image->height,
+            200, 200, _w / 2, _h, True);
+            
         /* XFlush(dpy); */
          
         //num++;
