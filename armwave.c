@@ -639,6 +639,8 @@ void armwave_grab_xid(int id, int tex_width, int tex_height)
     g_gc = XCreateGC(g_dpy, g_window, 0, 0);
     
     // Create the shared image
+    printf("Attaching XvShm...\n");
+    
     if(g_yuv_image != NULL) {
         // Unsure if this is reasonable
         XFree(g_yuv_image);
@@ -655,7 +657,7 @@ void armwave_grab_xid(int id, int tex_width, int tex_height)
         exit (-1);
     }
     
-    printf("%d\n", g_yuv_image->data_size);
+    printf("%d bytes for XvImage\n", g_yuv_image->data_size);
 }
 
 /*
@@ -834,7 +836,6 @@ int main()
     grat_colour.blue = 18000;
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
-    
     
     // first iter
     armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
