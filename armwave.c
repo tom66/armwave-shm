@@ -635,6 +635,7 @@ void armwave_grab_xid(int id)
 void armwave_init_x11()
 {
     XvAdaptorInfo *ai;
+    XVisualInfo	vinfo;
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
     int	p_num_adaptors, screen, ret;
     
@@ -721,7 +722,6 @@ int main()
     Window	window, _dw;
     XSizeHints hint;
     XSetWindowAttributes xswa;
-    XVisualInfo	vinfo;
     int	screen;
     unsigned long mask;
     XEvent event;
