@@ -760,37 +760,15 @@ int main()
 {
     int	yuv_width = 2048;
     int	yuv_height = 256;
-    
     int tex_width = 512;
     
-    int	xv_port = -1;
-    int	adaptor = -1, encodings, attributes, formats;
     int	i, j, ret, p, _d, _w, _h, n;
-    long secsb, secsa, frames;
-    
-    XvAdaptorInfo *ai;
-    XvEncodingInfo *ei;
-    XvAttribute	*at;
-    XvImageFormatValues	*fo;
-    XvImage	*yuv_image;
-
-    unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
-    int	p_num_adaptors;
      	
     Window	window, _dw;
     XSizeHints hint;
     XSetWindowAttributes xswa;
     XVisualInfo	vinfo;
-    int	screen;
     unsigned long mask;
-    XEvent event;
-    GC gc;
-    int shmem_flag = 0;
-    XShmSegmentInfo	yuv_shminfo;
-    int	CompletionType;
-    
-    int p_num_formats;
-    XvImageFormatValues *img_fmts;
     
     struct armwave_yuv_t grat_col;
     struct armwave_yuv_t yuv_col;
