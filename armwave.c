@@ -940,7 +940,6 @@ int main()
     
     armwave_init_xvimage_shared(tex_width, yuv_height);
     
-    
     grat_colour.red = 18000;
     grat_colour.green = 18000;
     grat_colour.blue = 18000;
@@ -958,14 +957,14 @@ int main()
     }
     */
     
-    printf("%d\n", g_yuv_image->data_size);
+    //printf("%d\n", g_yuv_image->data_size);
     
     // first iter
     armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
     armwave_generate();
     armwave_fill_xvimage_scaled(g_yuv_image);
         
-    XSetForeground(g_dpy, gc, grat_colour.pixel);
+    XSetForeground(g_dpy, g_gc, grat_colour.pixel);
         
     start = clock();
     
