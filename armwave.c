@@ -809,12 +809,14 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
  */
 void armwave_render_graticule()
 {
-    int w, h, i, j, m, p, q, ch, cw, n_sub;
+    int w, h, i, j, m, p, q, ch, cw, n_sub, hhalf, vhalf;
     float gr_size;
     m = g_armwave_state.frame_margin;
     w = g_canvas_dims.w - m;
     h = g_canvas_dims.h - m;
     n_sub = 1.0f / g_armwave_state.subdiv_frac;
+    hhalf = g_armwave_state.n_hdiv / 2;
+    vhalf = g_armwave_state.n_vdiv / 2;
     ch = h - m;
     cw = w - m;
     
@@ -831,6 +833,16 @@ void armwave_render_graticule()
         gr_size = (w / (float)g_armwave_state.n_hdiv);
         for(i = 1, p = m + gr_size; i < g_armwave_state.n_hdiv; i++, p += gr_size) {
             XDrawLine(g_dpy, g_window, g_gc, p, m, p, h);
+            
+            if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_SUBDIV) {
+                    if(i == hhalf) {
+                        for(j = 0; j < n_sub; j++) {
+                            q = p + (gr_size * g_armwave_state.subdiv_frac * j);
+                            printf("%3d, %3d\n", q, p);
+                            XDrawLine(g_dpy, g_window, g_gc, q, m + (ch / 2) - 16, q, m + (ch / 2) + 16);
+                        }
+                    }
+            }
         }
         
         gr_size = (h / (float)g_armwave_state.n_vdiv);
@@ -839,6 +851,7 @@ void armwave_render_graticule()
         }
     }
     
+    /*
     if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_SUBDIV) {
         gr_size = (w / (float)g_armwave_state.n_hdiv);
         
@@ -850,6 +863,7 @@ void armwave_render_graticule()
             }
         }
     }
+    */
 }
 
 /*
