@@ -842,16 +842,6 @@ int main()
     printf("Done, starting XVideo...\n");
     
     /*
-     * Check the display supports 24-bit TrueColor, if not then abort early.
-     */
-    if (XMatchVisualInfo(g_dpy, screen, 24, TrueColor, &vinfo)) {
-        printf("Found 24bit TrueColor.\n");
-    } else {
-        printf("Error: Fatal X11: not supported 24-bit TrueColor display.\n");
-        exit(-1);
-    }
-    
-    /*
      * Create the window and map it, then wait for it to send us a map event.
      */
     CompletionType = -1;	
