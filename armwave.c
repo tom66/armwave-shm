@@ -636,6 +636,26 @@ void armwave_grab_xid(int id)
         XFreeGC(g_dpy, g_gc);
     }
     g_gc = XCreateGC(g_dpy, g_window, 0, 0);
+    
+    
+    // Create the shared image
+    if(g_yuv_image != NULL) {
+        // Unsure if this is reasonable
+        XFree(g_yuv_image);
+        g_yuv_image = NULL;
+    }
+    
+    g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
+    yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
+    yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    yuv_shminfo.readOnly = False;
+    
+    if (!XShmAttach(g_dpy, &yuv_shminfo)) {
+        printf("Error: Fatal X11: XShmAttached failed\n", ret);
+        exit (-1);
+    }
+    
+    printf("%d\n", g_yuv_image->data_size);
 }
 
 /*
@@ -700,25 +720,6 @@ void armwave_init_x11(int tex_width, int tex_height)
         printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
         exit(-1);
     }
-    
-    // Create the shared image
-    if(g_yuv_image != NULL) {
-        // Unsure if this is reasonable
-        XFree(g_yuv_image);
-        g_yuv_image = NULL;
-    }
-    
-    g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
-    yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
-    yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
-    yuv_shminfo.readOnly = False;
-    
-    if (!XShmAttach(g_dpy, &yuv_shminfo)) {
-        printf("Error: Fatal X11: XShmAttached failed\n", ret);
-        exit (-1);
-    }
-    
-    printf("%d\n", g_yuv_image->data_size);
 }
 
 /*
