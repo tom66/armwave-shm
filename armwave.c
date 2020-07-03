@@ -85,28 +85,28 @@ void hsv2rgb(struct armwave_hsv_t *hsv_in, struct armwave_rgb_t *rgb_out)
 {
     // https://gist.github.com/kuathadianto/200148f53616cbd226d993b400214a7f
     // with modifications
-	float c = hsv_in.s * hsv_in.v;
-	float x = c * (1 - abs(fmod(hsv_in.h / 60.0, 2) - 1));
-	float m = hsv_in.v - c;
+	float c = hsv_in->s * hsv_in->v;
+	float x = c * (1 - abs(fmod(hsv_in->h / 60.0, 2) - 1));
+	float m = hsv_in->v - c;
 	float rs, gs, bs;
 
-	if(hsv_in.h >= 0 && hsv_in.h < 60) {
+	if(hsv_in->h >= 0 && hsv_in->h < 60) {
 		rs = c;
 		gs = x;
 		bs = 0;	
-	} else if(hsv_in.h >= 60 && hsv_in.h < 120) {	
+	} else if(hsv_in->h >= 60 && hsv_in->h < 120) {	
 		rs = x;
 		gs = c;
 		bs = 0;	
-	} else if(hsv_in.h >= 120 && hsv_in.h < 180) {
+	} else if(hsv_in->h >= 120 && hsv_in->h < 180) {
 		rs = 0;
 		gs = c;
 		bs = x;	
-	} else if(hsv_in.h >= 180 && hsv_in.h < 240) {
+	} else if(hsv_in->h >= 180 && hsv_in->h < 240) {
 		rs = 0;
 		gs = x;
 		bs = c;	
-	} else if(hsv_in.h >= 240 && hsv_in.h < 300) {
+	} else if(hsv_in->h >= 240 && hsv_in->h < 300) {
 		rs = x;
 		gs = 0;
 		bs = c;	
