@@ -840,7 +840,7 @@ int main()
     armwave_generate();
     armwave_fill_xvimage_scaled(yuv_image);
         
-    XSetForeground(g_dpy, gc, grat_colour.pixel);
+    XSetForeground(g_dpy, g_gc, grat_colour.pixel);
         
     start = clock();
     
@@ -852,16 +852,16 @@ int main()
         num += 1;
         XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
-        XvShmPutImage(g_dpy, g_xv_port, g_window, gc, yuv_image,
+        XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, yuv_image,
             0, 0, yuv_image->width, yuv_image->height,
             0, 0, _w, _h, True);
         
         for(i = 0; i < (_w / 12.0f); i++) {
-            XDrawLine(g_dpy, g_window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
+            XDrawLine(g_dpy, g_window, g_gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
         }
         
         for(i = 0; i < (_h / 8.0f); i++) {
-            XDrawLine(g_dpy, g_window, gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
+            XDrawLine(g_dpy, g_window, g_gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
         }
         
         /* XFlush(g_dpy); */
