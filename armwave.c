@@ -418,8 +418,8 @@ void armwave_setup_render(uint32_t start_point, uint32_t end_point, uint32_t wav
 
     printf("s=%d e=%d w=%d ws=%d tw=%d th=%d rf=0x%08x\n", start_point, end_point, waves_max, wave_stride, target_width, target_height, render_flags);
 
-    if(start_point < end_point) {
-        printf("Error: start point less than end point\n");
+    if(start_point > end_point) {
+        printf("Error: start point more than end point\n");
         return;
     }
 
