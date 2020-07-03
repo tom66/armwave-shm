@@ -37,6 +37,10 @@
 
 #define GUID_YUV12_PLANAR           0x32315659      // FOURCC for YUV12 format
 
+#define PLT_SINGLE_COLOUR           0
+#define PLT_INVERT_SINGLE_COLOUR    1
+#define PLT_RAINBOW_THERMAL         2
+
 // set to use ALU to do XCOORD mapping (instead of mapping table)
 #define USE_ALU_XCOORD              1
 
@@ -52,6 +56,11 @@ struct armwave_yuv_t {
 
 struct armwave_rgb_t {
     uint8_t r, g, b;
+};
+
+struct armwave_hsv_t {
+    // h 0..360, s/v 0..1
+    float h, s, v;
 };
 
 struct armwave_state_t {
@@ -107,15 +116,12 @@ struct armwave_state_t {
  * Function prototypes.
  */
 void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out);
+void hsv2rgb(struct armwave_hsv_t *hsv_in, struct armwave_rgb_t *rgb_out);
+
 void __attribute__((always_inline)) plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in);
 void __attribute__((always_inline)) plot_pixel_yuv_fastq(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in);
 
 void fill_rgb_xvimage(XvImage *img, struct armwave_rgb_t *rgb);
-
-void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_yuv_t *yuv);
-void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *yuv);
-void draw_horiz_line_fast_rgb_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_rgb_t *rgb);
-void draw_vert_line_fast_rgb_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *rgb);
 
 void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, struct armwave_color_mix_t *color1);
 

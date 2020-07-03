@@ -79,6 +79,49 @@ void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out)
 }
 
 /*
+ * Helper function to convert HSV to 8-bit RGB.
+ */
+void hsv2rgb(struct armwave_hsv_t *hsv_in, struct armwave_rgb_t *rgb_out)
+{
+    // https://gist.github.com/kuathadianto/200148f53616cbd226d993b400214a7f
+    // with modifications
+	float c = hsv_in.s * hsv_in.v;
+	float x = c * (1 - abs(fmod(hsv_in.h / 60.0, 2) - 1));
+	float m = hsv_in.v - c;
+	float rs, gs, bs;
+
+	if(hsv_in.h >= 0 && hsv_in.h < 60) {
+		rs = c;
+		gs = x;
+		bs = 0;	
+	} else if(hsv_in.h >= 60 && hsv_in.h < 120) {	
+		rs = x;
+		gs = c;
+		bs = 0;	
+	} else if(hsv_in.h >= 120 && hsv_in.h < 180) {
+		rs = 0;
+		gs = c;
+		bs = x;	
+	} else if(hsv_in.h >= 180 && hsv_in.h < 240) {
+		rs = 0;
+		gs = x;
+		bs = c;	
+	} else if(hsv_in.h >= 240 && hsv_in.h < 300) {
+		rs = x;
+		gs = 0;
+		bs = c;	
+	} else {
+		rs = c;
+		gs = 0;
+		bs = x;	
+	}
+	
+	rgb_out->r = (rs + m) * 255;
+	rgb_out->g = (gs + m) * 255;
+	rgb_out->b = (bs + m) * 255;
+}
+
+/*
  * Demo/helper function to plot YUV pixel on XvImage canvas.
  */
 void __attribute__((always_inline)) plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
@@ -122,116 +165,6 @@ void fill_rgb_xvimage(XvImage *img, struct armwave_rgb_t *rgb)
 }
 
 /*
- * Draw a horizontal line quickly.  Takes advantage of 32-bit writes where possible.
- *
- * Colour should be passed as YUV to reduce calculation overhead.  x0 must be less than x1
- * (behaviour is undefined if this is not the case.)
- */
-void draw_horiz_line_fast_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_yuv_t *yuv)
-{
-    int length;
-    uint32_t *data_y, *data_u, *data_v, yword, uword, vword;
-    
-    // Write pixels until x0 becomes multiple of 4
-    while(x0 & 3) {
-        plot_pixel_yuv(img, x0, y, yuv);
-        printf("1:%d,%d\n", x0, y);
-        x0++;
-    }
-    
-    printf("2:%d,%d\n", x0, y);
-        
-    // Write the bulk of pixels using a loop writing 32 bits at a time.
-    data_y = (uint32_t*)(img->data +(img->width * y) + x0);
-    data_v = (uint32_t*)(img->data + img->offsets[1] + (img->pitches[1] * (y / 2)) + (x0 / 2));
-    data_u = (uint32_t*)(img->data + img->offsets[2] + (img->pitches[2] * (y / 2)) + (x0 / 2));
-    
-    yword = yuv->y * 0x01010101;
-    uword = yuv->u * 0x01010101;
-    vword = yuv->v * 0x01010101;
-    
-    for(length = (x1 - x0) / 2; length > 4; length -= 4, x0 += 8) {
-        printf("3:%d,%d\n", x0, y);
-        *data_y++ = yword;
-        *data_y++ = yword;
-        *data_u++ = uword;
-        *data_v++ = vword;
-    }
-    
-    // Write remaining pixels until length is zero
-    while(length >= 0) {
-        printf("5:%d,%d\n", x0, y);
-        plot_pixel_yuv(img, x0, y, yuv);
-        x0++;
-        length--;
-    }
-}
-
-/*
- * Draw a vertical line quickly.  
- *
- * Colour should be passed as YUV to reduce calculation overhead.  y0 must be less than y1
- * (behaviour is undefined if this is not the case.)
- */
-void draw_vert_line_fast_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *yuv)
-{
-    int length;
-    uint8_t *data_y, *data_u, *data_v;
-    
-    // Find the X-address for the first pixel starting at y0.  Increment by the width for each write.
-    data_y = (uint8_t*)(img->data + (img->width * y0) + x);
-    data_v = (uint8_t*)(img->data + img->offsets[1] + (img->pitches[1] * (y0 / 2)) + (x / 2));
-    data_u = (uint8_t*)(img->data + img->offsets[2] + (img->pitches[2] * (y0 / 2)) + (x / 2));
-    
-    for(length = (y1 - y0) / 2; length > 0; length--, y0++) {
-        *data_y = yuv->y;
-        data_y += img->width;
-        *data_y = yuv->y;
-        data_y += img->width;
-        
-        *data_u = yuv->u;
-        *data_v = yuv->v;
-        data_u += img->width / 2;
-        data_v += img->width / 2;
-    }
-    
-    /*
-    for(length = (y1 - y0) / 2; length > 0; length--, y0++) {
-        *data_y = yuv->y;
-        data_y += img->width;
-    }
-    */
-    
-    // Compute the masks for writing the UV pixel value
-    /*
-    uv_nmask = ~(0x000000ff << (((x / 2) & 1) * 8));
-    printf("%08x %08x\n", y_nmask, uv_nmask);
-    */
-}
-
-/*
- * Fast horizontal line drawing function that supports RGB.
- */
-void draw_horiz_line_fast_rgb_xvimage(XvImage *img, int x0, int x1, int y, struct armwave_rgb_t *rgb)
-{
-    struct armwave_yuv_t yuv;
-    
-    rgb2yuv(rgb, &yuv);
-    draw_horiz_line_fast_xvimage(img, x0, x1, y, &yuv);
-}
-
-/*
- * Fast vertical line drawing function that supports RGB.
- */
-void draw_vert_line_fast_rgb_xvimage(XvImage *img, int x, int y0, int y1, struct armwave_yuv_t *rgb)
-{
-    struct armwave_yuv_t yuv;
-    
-    rgb2yuv(rgb, &yuv);
-    draw_vert_line_fast_xvimage(img, x, y0, y1, &yuv);
-}
-
-/*
  * Prepare the YUV table for a given range of intensities.
  *
  * This can be used to generate different palettes. Right now only
@@ -241,16 +174,41 @@ void draw_vert_line_fast_rgb_xvimage(XvImage *img, int x, int y0, int y1, struct
 void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, struct armwave_color_mix_t *color1)
 {
     int v;
-    struct armwave_rgb_t temp;
+    float h;
+    struct armwave_rgb_t rgb_temp;
+    struct armwave_hsv_t hsv_temp;
     
     switch(palette) {
-        case 0:
+        case PLT_SINGLE_COLOUR:
             for(v = 0; v < 256; v++) {
-                temp.r = MIN((color0->r * v) >> 8, 255);
-                temp.g = MIN((color0->g * v) >> 8, 255);
-                temp.b = MIN((color0->b * v) >> 8, 255);
-                printf("%3d = [%3d, %3d, %3d]\n", v, temp.r, temp.g, temp.b);
-                rgb2yuv(&temp, &yuv_lut[v]); 
+                rgb_temp.r = MIN((color0->r * v) >> 8, 255);
+                rgb_temp.g = MIN((color0->g * v) >> 8, 255);
+                rgb_temp.b = MIN((color0->b * v) >> 8, 255);
+                printf("%3d = [%3d, %3d, %3d]\n", v, rgb_temp.r, rgb_temp.g, rgb_temp.b);
+                rgb2yuv(&rgb_temp, &yuv_lut[v]); 
+            }
+            break;
+        
+        case PLT_INVERT_SINGLE_COLOUR:
+            for(v = 0; v < 256; v++) {
+                rgb_temp.r = MIN((color0->r * v) >> 8, 255);
+                rgb_temp.g = MIN((color0->g * v) >> 8, 255);
+                rgb_temp.b = MIN((color0->b * v) >> 8, 255);
+                printf("%3d = [%3d, %3d, %3d]\n", 255 - v, rgb_temp.r, rgb_temp.g, rgb_temp.b);
+                rgb2yuv(&rgb_temp, &yuv_lut[255 - v]); 
+            }
+            break;
+        
+        case PLT_RAINBOW_THERMAL:
+            for(v = 0; v < 256; v++) {
+                hsv_temp.h = (360.0f / 255.0f) * v;
+                hsv_temp.s = 1.0f;
+                hsv_temp.v = 1.0f;
+                
+                printf("%3d = [%3d, %3d, %3d]\n", v, hsv_temp.h, hsv_temp.s, hsv_temp.v);
+                
+                hsv2rgb(&hsv_temp, &rgb_temp);
+                rgb2yuv(&rgb_temp, &yuv_lut[v]); 
             }
             break;
     }
@@ -713,7 +671,7 @@ int main()
     printf("Preparing test waveforms...\n");
     armwave_setup_render(0, tex_width, 1024, tex_width, tex_width, 256, 0);
     armwave_set_channel_colour(1, 255, 178, 25, 10.0f);
-    armwave_prep_yuv_palette(0, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
+    armwave_prep_yuv_palette(PLT_SINGLE_COLOUR, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.25, 1e-5, n_test_waves);
     printf("Done, starting XVideo...\n");
     
