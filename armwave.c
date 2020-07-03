@@ -285,7 +285,7 @@ void armwave_init()
 void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
 {
     int yy, ys, w, scale_value;
-    uint64_T word;
+    uint64_t word;
     uint32_t value, word0, word1;
     uint8_t *wave_base;
     bufftyp_t *write_buffer_base;
