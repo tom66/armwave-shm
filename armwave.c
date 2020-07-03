@@ -736,6 +736,7 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
 {
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
     int	p_num_adaptors, ret, n;
+    XGCValues gc_values;
     XvAdaptorInfo *ai;
     
     /*
@@ -802,9 +803,9 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
         XFreeGC(g_dpy, g_gc);
     }
     
-    g_gc = XCreateGC(g_dpy, g_window, 0, 0);
-    g_gc->cap_style = CapNotLast;
-    g_gc->line_width = 1;
+    g_gc = XCreateGC(g_dpy, g_window, GCLineWidth | GCLineStyle, &gc_values);
+    gc_values.line_width = 1;
+    gc_values.cap_style = CapNotLast;
 }
 
 /*
