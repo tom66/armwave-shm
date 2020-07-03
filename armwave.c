@@ -831,8 +831,10 @@ void armwave_render_graticule()
     
     if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_DIVS) {
         gr_size = (w / (float)g_armwave_state.n_hdiv);
-        for(i = 1, p = m + gr_size; i < g_armwave_state.n_hdiv; i++, p += gr_size) {
-            XDrawLine(g_dpy, g_window, g_gc, p, m, p, h);
+        for(i = 0, p = m + gr_size; i < g_armwave_state.n_hdiv; i++, p += gr_size) {
+            if(i > 0) {
+                XDrawLine(g_dpy, g_window, g_gc, p, m, p, h);
+            }
             
             if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_SUBDIV) {
                 for(j = 1; j < n_sub; j++) {
