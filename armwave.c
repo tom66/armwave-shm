@@ -778,9 +778,9 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
 void armwave_render_graticule()
 {
     int w, h, i, m;
-    w = g_canvas_dims.w;
-    h = g_canvas_dims.h;
     m = g_armwave_state.frame_margin;
+    w = g_canvas_dims.w - (m * 2);
+    h = g_canvas_dims.h - (m * 2);
     
     XSetForeground(g_dpy, g_gc, g_grat_colour.pixel);
     
