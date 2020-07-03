@@ -56,6 +56,7 @@ Display *g_dpy;
 int g_xv_port;
 XVisualInfo	g_vinfo;
 GC g_gc = NULL;
+XvImage *g_yuv_image = NULL;
     
 struct MwmHints {
     unsigned long flags;
@@ -640,8 +641,9 @@ void armwave_grab_xid(int id)
 /*
  * Initialise the Xvideo and MITSHM extension.
  */
-void armwave_init_x11()
+void armwave_init_x11(int tex_width, int tex_height)
 {
+    XShmSegmentInfo	yuv_shminfo;
     XvAdaptorInfo *ai;
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
     int	p_num_adaptors, screen, ret;
@@ -698,6 +700,25 @@ void armwave_init_x11()
         printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
         exit(-1);
     }
+    
+    // Create the shared image
+    if(g_yuv_image != NULL) {
+        // Unsure if this is reasonable
+        XFree(g_yuv_image);
+        g_yuv_image = NULL;
+    }
+    
+    g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
+    yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
+    yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    yuv_shminfo.readOnly = False;
+    
+    if (!XShmAttach(g_dpy, &yuv_shminfo)) {
+        printf("Error: Fatal X11: XShmAttached failed\n", ret);
+        exit (-1);
+    }
+    
+    printf("%d\n", g_yuv_image->data_size);
 }
 
 /*
@@ -727,18 +748,13 @@ int main()
     XvEncodingInfo *ei;
     XvAttribute	*at;
     XvImageFormatValues	*fo;
-    XvImage	*yuv_image;
      	
-    Display	*dpy;
-    Window	window, _dw;
-    XSizeHints hint;
+    Window	_dw;
     XSetWindowAttributes xswa;
     int	screen;
     unsigned long mask;
     XEvent event;
     int shmem_flag = 0;
-    XShmSegmentInfo	yuv_shminfo;
-    int	CompletionType;
     
     int p_num_formats;
     XvImageFormatValues *img_fmts;
@@ -782,13 +798,6 @@ int main()
     /*
      * Create the window and map it.
      */
-    CompletionType = -1;	
-    hint.x = 1;
-    hint.y = 1;
-    hint.width = yuv_width;
-    hint.height = yuv_height;
-    hint.flags = PPosition | PSize;
-    
     xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), g_vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
@@ -826,22 +835,11 @@ int main()
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
     
-    yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
-    yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
-    yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
-    yuv_shminfo.readOnly = False;
-    
-    if (!XShmAttach(g_dpy, &yuv_shminfo)) {
-        printf("Error: Fatal X11: XShmAttached failed\n", ret);
-        exit (-1);
-    }
-    
-    printf("%d\n", yuv_image->data_size);
     
     // first iter
     armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
     armwave_generate();
-    armwave_fill_xvimage_scaled(yuv_image);
+    armwave_fill_xvimage_scaled(g_yuv_image);
         
     XSetForeground(g_dpy, g_gc, grat_colour.pixel);
         
@@ -850,13 +848,13 @@ int main()
     while (1) {
         armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
         armwave_generate();
-        armwave_fill_xvimage_scaled(yuv_image);
+        armwave_fill_xvimage_scaled(g_yuv_image);
         
         num += 1;
         XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
-        XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, yuv_image,
-            0, 0, yuv_image->width, yuv_image->height,
+        XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
+            0, 0, g_yuv_image->width, g_yuv_image->height,
             0, 0, _w, _h, True);
         
         for(i = 0; i < (_w / 12.0f); i++) {
