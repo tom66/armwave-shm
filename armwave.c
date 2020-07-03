@@ -630,12 +630,6 @@ void armwave_grab_xid(int id)
         XNextEvent(g_dpy, &event);
     }
     while(event.type != MapNotify || event.xmap.event != g_window);
-    
-    // Create the GC
-    if(g_gc != NULL) {
-        XFreeGC(g_dpy, g_gc);
-    }
-    g_gc = XCreateGC(g_dpy, g_window, 0, 0);
 }
 
 /*
@@ -733,6 +727,12 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
     }
     
     printf("%d bytes for XvImage, shmid %d, xv_port %d\n", g_yuv_image->data_size, yuv_shminfo.shmid, g_xv_port);
+    
+    // Create the GC
+    if(g_gc != NULL) {
+        XFreeGC(g_dpy, g_gc);
+    }
+    g_gc = XCreateGC(g_dpy, g_window, 0, 0);
 }
  
 /*
