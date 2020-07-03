@@ -38,7 +38,7 @@
 #define GUID_YUV12_PLANAR           0x32315659      // FOURCC for YUV12 format
 
 // set to use ALU to do XCOORD mapping (instead of mapping table)
-//#define USE_ALU_XCOORD
+#define USE_ALU_XCOORD              0
 
 typedef uint16_t bufftyp_t;
 
