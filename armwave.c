@@ -720,6 +720,8 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
         g_yuv_image = NULL;
     }
     
+    XShmGetEventBase(g_dpy);  // What does this do? 
+    
     g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
     yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
     yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
