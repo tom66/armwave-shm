@@ -881,6 +881,7 @@ int main()
         
         printf("Done...\n");
         
+        /*
         for(i = 0; i < (_w / 12.0f); i++) {
             XDrawLine(g_dpy, g_window, g_gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
         }
@@ -888,6 +889,7 @@ int main()
         for(i = 0; i < (_h / 8.0f); i++) {
             XDrawLine(g_dpy, g_window, g_gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
         }
+        */
         
         /* XFlush(g_dpy); */
          
