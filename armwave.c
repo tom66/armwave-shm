@@ -968,9 +968,9 @@ int main()
     
     gc = XCreateGC(dpy, window, 0, 0);
     
-    grat_colour.red = 32000;
-    grat_colour.green = 0;
-    grat_colour.blue = 0;
+    grat_colour.red = 18000;
+    grat_colour.green = 18000;
+    grat_colour.blue = 18000;
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(dpy, xswa.colormap, &grat_colour);
     
