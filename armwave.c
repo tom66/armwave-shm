@@ -606,7 +606,7 @@ void armwave_cleanup()
 void armwave_grab_xid(int id)
 {
     if(g_window_id != 0) {
-        XUnmapWindow(g_window_id);
+        XUnmapWindow(g_dpy, g_window_id);
     }
     
     g_window_id = id;
