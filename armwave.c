@@ -787,7 +787,7 @@ void armwave_render_frame_x11()
     
     XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
         0, 0, g_yuv_image->width, g_yuv_image->height,
-        0, 0, _w, _h, True);
+        1, 1, _w - 2, _h - 2, True);
     
     armwave_render_graticule();
 }
