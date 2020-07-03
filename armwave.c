@@ -750,7 +750,7 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
  */
 void armwave_render_graticule()
 {
-    int w, h;
+    int w, h, i;
     w = g_canvas_dims.w;
     h = g_canvas_dims.h;
     
