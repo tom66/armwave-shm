@@ -794,13 +794,18 @@ void armwave_render_graticule()
     
     if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_DIVS) {
         gr_size = (w / 12.0f);
+        
         for(i = 1, p = m + gr_size; i < 12; i++, p += gr_size) {
-            XDrawLine(g_dpy, g_window, g_gc, p, m, p, h);
+            if(i != 6) {  // Skip crosshair
+                XDrawLine(g_dpy, g_window, g_gc, p, m, p, h);
+            }
         }
         
         gr_size = (h / 8.0f);
         for(i = 1, p = m + gr_size; i < 8; i++, p += gr_size) {
-            XDrawLine(g_dpy, g_window, g_gc, m, p, w, p);
+            if(i != 4) {  // Skip crosshair
+                XDrawLine(g_dpy, g_window, g_gc, m, p, w, p);
+            }
         }
     }
 }
