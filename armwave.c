@@ -44,9 +44,9 @@
 #define ARMWAVE_VER  "v0.0.1"
 
 struct armwave_state_t g_armwave_state;
-struct armwave_yuv_t yuv_lut[256];
+struct armwave_yuv_t g_yuv_lut[256];
 
-const struct armwave_rgb_t fill_black = { 0, 0, 0 };
+const struct armwave_rgb_t g_fill_black = { 0, 0, 0 };
 
 /*
  * X11 properties.  Should these be commoned into one struct?
@@ -55,6 +55,7 @@ Window g_window = 0;
 Display *g_dpy;
 int g_xv_port;
 XVisualInfo	g_vinfo;
+GC g_gc;
     
 struct MwmHints {
     unsigned long flags;
@@ -197,7 +198,7 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
                 rgb_temp.g = MIN((color0->g * v) >> 8, 255);
                 rgb_temp.b = MIN((color0->b * v) >> 8, 255);
                 printf("%3d = [%3d, %3d, %3d]\n", v, rgb_temp.r, rgb_temp.g, rgb_temp.b);
-                rgb2yuv(&rgb_temp, &yuv_lut[v]); 
+                rgb2yuv(&rgb_temp, &g_yuv_lut[v]); 
             }
             break;
         
@@ -207,7 +208,7 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
                 rgb_temp.g = MIN((color0->g * v) >> 8, 255);
                 rgb_temp.b = MIN((color0->b * v) >> 8, 255);
                 printf("%3d = [%3d, %3d, %3d]\n", 255 - v, rgb_temp.r, rgb_temp.g, rgb_temp.b);
-                rgb2yuv(&rgb_temp, &yuv_lut[255 - v]); 
+                rgb2yuv(&rgb_temp, &g_yuv_lut[255 - v]); 
             }
             break;
         
@@ -223,7 +224,7 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
                 }
                 
                 hsv2rgb(&hsv_temp, &rgb_temp);
-                rgb2yuv(&rgb_temp, &yuv_lut[v]); 
+                rgb2yuv(&rgb_temp, &g_yuv_lut[v]); 
                 
                 printf("%3d = [%3d, %3d, %3d] RGB: %3d, %3d, %3d\n", v, hsv_temp.h, hsv_temp.s, hsv_temp.v, rgb_temp.r, rgb_temp.g, rgb_temp.b);
             }
@@ -231,7 +232,7 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
     }
     
     for(v = 0; v < 256; v++) {
-        printf("%3d = (%3d, %3d, %3d)\n", v, yuv_lut[v].y, yuv_lut[v].u, yuv_lut[v].v);
+        printf("%3d = (%3d, %3d, %3d)\n", v, g_yuv_lut[v].y, g_yuv_lut[v].u, g_yuv_lut[v].v);
     }
 }
 
@@ -332,7 +333,7 @@ void armwave_fill_xvimage_scaled(XvImage *img)
 
     // we don't really want to be doing this if possible;  os.madvise may be a better option
     //memset(out_buffer, 0x00, g_armwave_state.target_width * g_armwave_state.target_height * 4);
-    fill_rgb_xvimage(img, &fill_black);
+    fill_rgb_xvimage(img, &g_fill_black);
     
     //printf("iter...\n");
 
@@ -351,8 +352,8 @@ void armwave_fill_xvimage_scaled(XvImage *img)
                     xx = (nsub >> 8) / 2;
 
                     // FASTQ does not paint U/V for odd pixels; works OK for most purposes.
-                    //plot_pixel_yuv_fastq(img, xx, yy, &yuv_lut[MIN(value, 255)]);
-                    plot_pixel_yuv(img, xx, yy, &yuv_lut[MIN(value, 255)]);
+                    //plot_pixel_yuv_fastq(img, xx, yy, &g_yuv_lut[MIN(value, 255)]);
+                    plot_pixel_yuv(img, xx, yy, &g_yuv_lut[MIN(value, 255)]);
                     painted++;
                 }
             }
@@ -691,7 +692,14 @@ void armwave_init_x11()
         printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
         exit(-1);
     }
+    
+    // Create the GC
+    g_gc = XCreateGC(g_dpy, g_window, 0, 0);
 }
+
+/*
+ * Initialise the graticule
+ */
 
 /*
  * Run one rendering tick.
@@ -725,7 +733,6 @@ int main()
     int	screen;
     unsigned long mask;
     XEvent event;
-    GC gc;
     int shmem_flag = 0;
     XShmSegmentInfo	yuv_shminfo;
     int	CompletionType;
@@ -809,8 +816,6 @@ int main()
     XChangeProperty(g_dpy, g_window, mwmHintsProperty, mwmHintsProperty, 32,
             PropModeReplace, (unsigned char *)&hints, 5);
     */
-    
-    gc = XCreateGC(g_dpy, g_window, 0, 0);
     
     grat_colour.red = 18000;
     grat_colour.green = 18000;
