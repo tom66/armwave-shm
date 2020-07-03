@@ -542,6 +542,16 @@ void armwave_set_graticule_colour(int r, int g, int b)
 }
 
 /*
+ * Set the graticule/waveform margin.
+ */
+void armwave_set_graticule_margin(int marg)
+{
+    if(marg > 0) {
+        g_armwave_state.frame_margin = marg;
+    }
+}
+
+/*
  * Allocate a test buffer, freeing any existing buffer.
  */
 void armwave_test_buffer_alloc(int nsets)
@@ -792,6 +802,7 @@ void armwave_render_frame_x11()
 {
     Window _dw;
     int _d, _w, _h;
+    int m = g_armwave_state.frame_margin;
     
     armwave_set_wave_pointer_as_testbuf(g_frame_num % g_n_test_waves);
     armwave_generate();
@@ -803,7 +814,7 @@ void armwave_render_frame_x11()
     
     XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
         0, 0, g_yuv_image->width, g_yuv_image->height,
-        1, 1, _w - 2, _h - 2, True);
+        m, m, _w - (m * 2), _h - (m * 2), True);
     
     armwave_render_graticule();
 }
@@ -881,6 +892,7 @@ int main()
     printf("X11 Window: %d (0x%08x)\n", window, window);
     
     armwave_set_graticule_colour(127, 127, 127);
+    armwave_set_graticule_margin(10);
     
     armwave_grab_xid(window);
     armwave_init_xvimage_shared(tex_width, yuv_height);

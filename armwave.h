@@ -100,6 +100,7 @@ struct armwave_state_t {
   int wave_length;
   int ch_buff_size;
   int size;
+  int frame_margin;
 
   int target_width;
   int target_height;
