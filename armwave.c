@@ -815,7 +815,7 @@ int main()
     int	yuv_width = 2048;
     int	yuv_height = 256;
     
-    int tex_width = 2048;
+    int tex_width = 1024;
     
     int	xv_port = -1;
     int	adaptor = -1, encodings, attributes, formats;
