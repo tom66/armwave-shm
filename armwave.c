@@ -207,7 +207,12 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
             for(v = 0; v < 256; v++) {
                 hsv_temp.h = v;
                 hsv_temp.s = 255;
-                hsv_temp.v = 255;
+                
+                if(v < 20) {
+                    hsv_temp.v = (255 / 20.0f) * v;
+                } else {
+                    hsv_temp.v = 255;
+                }
                 
                 hsv2rgb(&hsv_temp, &rgb_temp);
                 rgb2yuv(&rgb_temp, &yuv_lut[v]); 
