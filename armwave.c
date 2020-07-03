@@ -1039,6 +1039,10 @@ int main()
             XDrawLine(dpy, window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
         }
         
+        for(i = 0; i < (_h / 8.0f); i++) {
+            XDrawLine(dpy, window, gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
+        }
+        
         /* XFlush(dpy); */
          
         //num++;
