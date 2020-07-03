@@ -786,7 +786,8 @@ void armwave_render_graticule()
     XSetForeground(g_dpy, g_gc, g_grat_colour.pixel);
     
     if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_FRAME) {
-        XDrawLine(g_dpy, g_window, g_gc, m, m, w - (m * 2), m);
+        XDrawLine(g_dpy, g_window, g_gc, m, m, w, m);
+        XDrawLine(g_dpy, g_window, g_gc, m, h, w, h);
     }
     
     if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_DIVS) {
