@@ -62,7 +62,7 @@ XVisualInfo	g_vinfo;
 GC g_gc = NULL;
 XvImage *g_yuv_image = NULL;
 XShmSegmentInfo g_yuv_shminfo;
-XColor g_grat_colour; 
+XColor g_grat_colour, g_grat_subcolour; 
 XSetWindowAttributes g_xswa;
     
 struct MwmHints {
@@ -544,6 +544,18 @@ void armwave_set_graticule_colour(int r, int g, int b)
 }
 
 /*
+ * Set the graticule sub colour.
+ */
+void armwave_set_graticule_subcolour(int r, int g, int b)
+{
+    g_grat_subcolour.red = r * 255;
+    g_grat_subcolour.green = g * 255;
+    g_grat_subcolour.blue = b * 255;
+    g_grat_subcolour.flags = DoRed | DoGreen | DoBlue;
+    XAllocColor(g_dpy, g_xswa.colormap, &g_grat_subcolour);
+}
+
+/*
  * Set the graticule dimensions.
  */
 void armwave_set_graticule_dims(int marg, int n_hdiv, int n_vdiv)
@@ -919,7 +931,8 @@ int main()
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
     
-    armwave_set_graticule_colour(127, 127, 127);
+    armwave_set_graticule_colour(75, 75, 75);
+    armwave_set_graticule_subcolour(127, 127, 127);
     armwave_set_graticule_dims(10, 12, 8);
     
     armwave_grab_xid(window);
