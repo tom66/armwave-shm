@@ -835,13 +835,11 @@ void armwave_render_graticule()
             XDrawLine(g_dpy, g_window, g_gc, p, m, p, h);
             
             if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_SUBDIV) {
-                    if(i == hhalf) {
-                        for(j = 0; j < n_sub; j++) {
-                            q = p + (gr_size * g_armwave_state.subdiv_frac * j);
-                            printf("%3d, %3d\n", q, p);
-                            XDrawLine(g_dpy, g_window, g_gc, q, m + (ch / 2) - 16, q, m + (ch / 2) + 16);
-                        }
-                    }
+                for(j = 1; j < n_sub; j++) {
+                    q = p + (gr_size * g_armwave_state.subdiv_frac * j);
+                    printf("%3d, %3d\n", q, p);
+                    XDrawLine(g_dpy, g_window, g_gc, q, m + (ch / 2) - 16, q, m + (ch / 2) + 16);
+                }
             }
         }
         
