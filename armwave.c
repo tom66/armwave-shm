@@ -605,6 +605,8 @@ void armwave_cleanup()
  */
 void armwave_grab_xid(int id)
 {
+    XEvent event;
+    
     if(g_window_id != 0) {
         XUnmapWindow(g_dpy, g_window_id);
     }
@@ -618,7 +620,7 @@ void armwave_grab_xid(int id)
     XMapWindow(g_dpy, g_window_id);
     
     do {
-        XNextEvent(dg_py, &event);
+        XNextEvent(g_dpy, &event);
     }
     while (event.type != MapNotify || event.xmap.event != g_window_id);
 }
