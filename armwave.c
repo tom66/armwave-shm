@@ -80,6 +80,8 @@ void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out)
 
 /*
  * Helper function to convert 8-bit HSV to 8-bit RGB.
+ *
+ * https://stackoverflow.com/questions/3018313/algorithm-to-convert-rgb-to-hsv-and-hsv-to-rgb-in-range-0-255-for-both
  */
 void hsv2rgb(struct armwave_hsv_t *hsv_in, struct armwave_rgb_t *rgb_out)
 {
