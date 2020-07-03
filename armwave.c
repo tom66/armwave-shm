@@ -681,6 +681,8 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
         exit(-1);
     }
     
+    XShmGetEventBase(g_dpy);  // What does this do? 
+    
     ret = XvQueryExtension(g_dpy, &p_version, &p_release, &p_request_base,
 			 &p_event_base, &p_error_base);
     if(ret != Success) {
@@ -713,8 +715,6 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
         XFree(g_yuv_image);
         g_yuv_image = NULL;
     }
-    
-    XShmGetEventBase(g_dpy);  // What does this do? 
     
     g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
     yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
