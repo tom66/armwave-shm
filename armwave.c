@@ -48,8 +48,12 @@ struct armwave_yuv_t yuv_lut[256];
 
 const struct armwave_rgb_t fill_black = { 0, 0, 0 };
 
+/*
+ * X11 properties.  Should these be commoned into one struct?
+ */ 
 Window g_window = 0;
 Display *g_dpy;
+int g_xv_port;
 
 struct MwmHints {
     unsigned long flags;
@@ -630,6 +634,9 @@ void armwave_grab_xid(int id)
  */
 void armwave_init_x11()
 {
+    unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
+    int	p_num_adaptors;
+    
     printf("armwave: initialising for X11...\n");
         
     /*
@@ -677,8 +684,8 @@ void armwave_init_x11()
     }
     
     // Use the last port available
-    xv_port = ai[p_num_adaptors - 1].base_id;
-    if(xv_port == -1) {
+    g_xv_port = ai[p_num_adaptors - 1].base_id;
+    if(g_xv_port == -1) {
         printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
         exit(-1);
     }
@@ -700,7 +707,6 @@ int main()
     
     int tex_width = 512;
     
-    int	xv_port = -1;
     int	adaptor = -1, encodings, attributes, formats;
     int	i, j, ret, p, _d, _w, _h, n;
     long secsb, secsa, frames;
@@ -710,9 +716,6 @@ int main()
     XvAttribute	*at;
     XvImageFormatValues	*fo;
     XvImage	*yuv_image;
-
-    unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
-    int	p_num_adaptors;
      	
     Display	*dpy;
     Window	window, _dw;
