@@ -1060,7 +1060,7 @@ int main()
             time_elapsed = ((float)(end - start)) / CLOCKS_PER_SEC;
             printf("%d frames (%6d total) took %.2f ms (%.1f fps, %d waves/sec)\n", \
                 stat_rate, num, time_elapsed * 1000, ((float)stat_rate) / time_elapsed,
-                (((float)stat_rate) / time_elapsed) * armwave_state.waves_max);
+                (((float)stat_rate) / time_elapsed) * g_armwave_state.waves_max);
             
             start = clock();
         }
