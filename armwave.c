@@ -813,22 +813,8 @@ int main()
     grat_rgb_col.g = 127;
     grat_rgb_col.b = 127;
     
-    //rgb2yuv(&grat_rgb_col, &grat_col);
-    
     printf("Starting up testapp...\n\n");
     
-    /*
-     * Try to open the display.
-     */
-    /*
-    dpy = XOpenDisplay(NULL);
-    if (dpy == NULL) {
-        printf("Cannot open display.\n");
-        exit (-1);
-    }
-    
-    screen = DefaultScreen(dpy);
-    */
     armwave_init_x11();
     
     /*
@@ -851,18 +837,12 @@ int main()
     hint.height = yuv_height;
     hint.flags = PPosition | PSize;
     
-    printf("A (dpy=0x%08x)\n", g_dpy);
-    
     xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), g_vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
     xswa.border_pixel = 0;
     
-    printf("B\n");
-    
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
-    
-    printf("C\n");
     
     window = XCreateWindow(g_dpy, DefaultRootWindow(g_dpy),
 			 0, 0,
@@ -873,71 +853,9 @@ int main()
 			 g_vinfo.visual,
 			 mask, &xswa);
     
-    printf("D\n");
-    
     printf("X11 Window: %d (0x%08x)\n", window, window);
     
     armwave_grab_xid(window);
-    
-    /*
-     * Try to strip decoration from window.
-     */
-    /*
-    Atom mwmHintsProperty = XInternAtom(g_dpy, "_MOTIF_WM_HINTS", 0);
-    struct MwmHints hints;
-    hints.flags = MWM_HINTS_DECORATIONS;
-    hints.decorations = 0;
-    XChangeProperty(g_dpy, window, mwmHintsProperty, mwmHintsProperty, 32,
-            PropModeReplace, (unsigned char *)&hints, 5);
-    */
-    
-    /*
-     * Query the MITSHM extension - check it is available.
-     */
-    /*
-    if (XShmQueryExtension(g_dpy)) {
-        shmem_flag = 1;
-    }
-    
-    if (!shmem_flag) {
-        printf("Error: Fatal X11: Shared memory extension not available or failed to allocate shared memory.\n");
-        exit(-1);
-    }
-    
-    if (shmem_flag == 1) {
-        CompletionType = XShmGetEventBase(g_dpy) + ShmCompletion;
-    }
-    
-    ret = XvQueryExtension(g_dpy, &p_version, &p_release, &p_request_base,
-			 &p_event_base, &p_error_base);
-    if (ret != Success) {
-        printf("Error: Fatal X11: Unable to find XVideo extension (%d).  Is it configured correctly?\n", ret);
-        exit(-1);
-    }
-    
-    ret = XvQueryAdaptors(g_dpy, DefaultRootWindow(g_dpy),
-			&p_num_adaptors, &ai);
-    
-    if (ret != Success) {
-        printf("Error: Fatal X11: Unable to query XVideo extension (%d).  Is it configured correctly?\n", ret);
-        exit(-1);
-    }
-    
-    // Use the last port available
-    xv_port = ai[p_num_adaptors - 1].base_id;
-    if(xv_port == -1) {
-        printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
-        exit(-1);
-    }
-    
-    yuv_image = XvShmCreateImage(g_dpy, xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
-    yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
-    yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
-    yuv_shminfo.readOnly = False;
-    
-    gc = XCreateGC(g_dpy, g_window, 0, 0);
-    */
-    
     armwave_init_xvimage_shared(tex_width, yuv_height);
     
     grat_colour.red = 18000;
@@ -945,19 +863,6 @@ int main()
     grat_colour.blue = 18000;
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
-    
-    /*
-    for(n = 0; n < yuv_image->num_planes; n++) {
-        printf("yuv_image plane %d offset %d pitch %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
-    }
-    
-    if (!XShmAttach(g_dpy, &yuv_shminfo)) {
-        printf("Error: Fatal X11: XShmAttached failed\n", ret);
-        exit (-1);
-    }
-    */
-    
-    //printf("%d\n", g_yuv_image->data_size);
     
     // first iter
     armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
