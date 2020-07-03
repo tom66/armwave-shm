@@ -1035,8 +1035,6 @@ int main()
 			 mask, &xswa);
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
-    
-    printf("X11 Window: %d (0x%08x)\n", window, window);
     armwave_grab_xid(window);
     
     /*
@@ -1089,7 +1087,7 @@ int main()
         exit(-1);
     }
     
-    gc = XCreateGC(dpy, window, 0, 0);
+    gc = XCreateGC(dpy, g_window, 0, 0);
     
     grat_colour.red = 18000;
     grat_colour.green = 18000;
@@ -1128,18 +1126,18 @@ int main()
         armwave_fill_xvimage_scaled(yuv_image);
         
         num += 1;
-        XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
+        XGetGeometry(dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
-        XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
+        XvShmPutImage(dpy, xv_port, g_window, gc, yuv_image,
             0, 0, yuv_image->width, yuv_image->height,
             0, 0, _w, _h, True);
         
         for(i = 0; i < (_w / 12.0f); i++) {
-            XDrawLine(dpy, window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
+            XDrawLine(dpy, g_window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
         }
         
         for(i = 0; i < (_h / 8.0f); i++) {
-            XDrawLine(dpy, window, gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
+            XDrawLine(dpy, g_window, gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
         }
         
         /* XFlush(dpy); */
