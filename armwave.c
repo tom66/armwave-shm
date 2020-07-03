@@ -851,12 +851,18 @@ int main()
     hint.height = yuv_height;
     hint.flags = PPosition | PSize;
     
+    printf("A\n");
+    
     xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
     xswa.border_pixel = 0;
     
+    printf("B\n");
+    
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
+    
+    printf("C\n");
     
     window = XCreateWindow(g_dpy, DefaultRootWindow(g_dpy),
 			 0, 0,
@@ -866,6 +872,8 @@ int main()
 			 InputOutput,
 			 vinfo.visual,
 			 mask, &xswa);
+    
+    printf("D\n");
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
     
