@@ -780,8 +780,8 @@ void armwave_render_graticule()
     int w, h, i, m, p;
     float gr_size;
     m = g_armwave_state.frame_margin;
-    w = g_canvas_dims.w - (m * 2);
-    h = g_canvas_dims.h - (m * 2);
+    w = g_canvas_dims.w - m;
+    h = g_canvas_dims.h - m;
     
     XSetForeground(g_dpy, g_gc, g_grat_colour.pixel);
     
@@ -835,7 +835,7 @@ void armwave_render_frame_x11()
     
     XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
         0, 0, g_yuv_image->width, g_yuv_image->height,
-        m, m, _w - (m * 3), _h - (m * 3), True);
+        m, m, _w - (m * 2), _h - (m * 2), True);
     
     armwave_render_graticule();
 }
