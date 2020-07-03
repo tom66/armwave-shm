@@ -610,7 +610,7 @@ void armwave_cleanup()
 /*
  * Grab a given XWindow by ID.
  */
-void armwave_grab_xid(int id)
+void armwave_grab_xid(int id, int tex_width, int tex_height)
 {
     XShmSegmentInfo	yuv_shminfo;
     XEvent event;
@@ -638,7 +638,6 @@ void armwave_grab_xid(int id)
     }
     g_gc = XCreateGC(g_dpy, g_window, 0, 0);
     
-    
     // Create the shared image
     if(g_yuv_image != NULL) {
         // Unsure if this is reasonable
@@ -652,7 +651,7 @@ void armwave_grab_xid(int id)
     yuv_shminfo.readOnly = False;
     
     if(!XShmAttach(g_dpy, &yuv_shminfo)) {
-        printf("Error: Fatal X11: XShmAttached failed\n", ret);
+        printf("Error: Fatal X11: XShmAttached failed\n");
         exit (-1);
     }
     
@@ -662,7 +661,7 @@ void armwave_grab_xid(int id)
 /*
  * Initialise the Xvideo and MITSHM extension.
  */
-void armwave_init_x11(int tex_width, int tex_height)
+void armwave_init_x11()
 {
     XvAdaptorInfo *ai;
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
@@ -794,7 +793,7 @@ int main()
     armwave_prep_yuv_palette(PLT_RAINBOW_THERMAL, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.25, 1e-5, n_test_waves);
     
-    armwave_init_x11(tex_width, yuv_height);
+    armwave_init_x11();
     
     /*
      * Create the window and map it.
@@ -816,7 +815,7 @@ int main()
 			 mask, &xswa);
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
-    armwave_grab_xid(window);
+    armwave_grab_xid(window, tex_width, yuv_height);
     
     /*
      * Try to strip decoration from window.
