@@ -870,7 +870,6 @@ int main()
     struct armwave_yuv_t yuv_col;
     struct armwave_rgb_t grat_rgb_col;
     struct armwave_rgb_t rgb_col;
-    int num = 0;
     
     clock_t start, end;
     float time_elapsed;
@@ -933,16 +932,13 @@ int main()
         armwave_render_frame_x11();
         g_frame_num += 1;
         
-        /*
-        */
-        
         /* XFlush(g_dpy); */
          
         if(g_frame_num % stat_rate == 0) {
             end = clock();
             time_elapsed = ((float)(end - start)) / CLOCKS_PER_SEC;
             printf("%d frames (%6d total) took %.2f ms (%.1f fps, %.1f waves/sec)\n", \
-                stat_rate, num, time_elapsed * 1000, ((float)stat_rate) / time_elapsed,
+                stat_rate, g_frame_num, time_elapsed * 1000, ((float)stat_rate) / time_elapsed,
                 (((float)stat_rate) / time_elapsed) * g_armwave_state.waves_max);
             
             start = clock();
