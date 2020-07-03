@@ -873,6 +873,7 @@ int main()
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
     
+    armwave_grab_xid(window);
     g_window = window;
     //armwave_grab_xid(window);
     
