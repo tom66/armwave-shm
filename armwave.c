@@ -816,7 +816,7 @@ void armwave_render_frame_x11()
     g_canvas_dims.h = _h;
     
     if(g_canvas_dims_last != g_canvas_dims) {
-        XClearWindow(g_window);
+        XClearWindow(g_dpy, g_window);
     }
     
     g_canvas_dims_last = g_canvas_dims;
