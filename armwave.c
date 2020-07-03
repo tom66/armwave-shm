@@ -794,7 +794,7 @@ void armwave_cleanup()
 #ifdef NO_PYTHON
 int main()
 {
-    int	yuv_width = 1024;
+    int	yuv_width = 2048;
     int	yuv_height = 256;
     
     int	xv_port = -1;
