@@ -305,7 +305,7 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
         // roll through y and render the slice into the out buffer
         // buffer is rendered rotated by 90 degrees
         for(yy = 0; yy < height; yy += 4) {
-            word = *(uint32_t*)(wave_base + yy); // Read 8 bytes at once
+            word = *(uint32_t*)(wave_base + yy); // Read 4 bytes at once
             
             for(ys = 0; ys < 4; ys++) {
                 scale_value = word & 0xff;
@@ -489,18 +489,15 @@ void armwave_setup_render(uint32_t start_point, uint32_t end_point, uint32_t wav
     points_per_pixel = length / ((float)(target_width));
     g_armwave_state.slice_record_height = points_per_pixel * g_armwave_state.slice_height;
 
-    /*
     g_armwave_state.xcoord_to_xpixel = malloc(length * sizeof(uint16_t));
 
     assert(g_armwave_state.xcoord_to_xpixel != NULL);
 
-    for(xx = 0; xx < length; xx++) {
-        g_armwave_state.xcoord_to_xpixel[xx] = (1.0f / points_per_pixel) * xx;
-
-        // printf("xcoord_to_xpixel[%5d] = %5d (scale:%8.3f)\n", xx, g_armwave_state.xcoord_to_xpixel[xx], 1.0f / points_per_pixel);
+    for(xx = 0; xx < g_armwave_state.slice_height; xx++) {
+        g_armwave_state.xcoord_to_xpixel[xx] = ((xx * g_armwave_state.cmp_x_bitdepth_scale) >> AM_XCOORD_MULT_SHIFT);
+        printf("xcoord_to_xpixel[%5d] = %5d\n", xx, g_armwave_state.xcoord_to_xpixel[xx]);
     }
-    */
-
+    
     g_armwave_state.out_pixbuf = malloc(sizeof(uint32_t) * g_armwave_state.size);
 
     printf("Ptrs: 0x%08x 0x%08x 0x%08x 0x%08x \n", \
@@ -620,23 +617,6 @@ void armwave_test_dump_buffer_to_ppm(char *fn)
 {
     armwave_dump_ppm_debug(g_armwave_state.out_pixbuf, fn);
 }
-
-/*
- * Render GDK buffer with test funtionry.
- */
-#ifndef NO_PYTHON
-void armwave_test_fill_gdkbuf(PyObject *buf)
-{
-    //PyObject *mv;
-    //Py_buffer *buf = malloc(sizeof(Py_buffer));
-
-    // Holy jesus dear mother of God, what have we done?
-    void *out_pixbuf = ((uint32_t ***)buf)[2][10];
-    
-    // TODO: use armwave_fill_pixbuf_256 for 256-height buffers for performance?
-    //armwave_fill_pixbuf_scaled(out_pixbuf);
-}
-#endif
 
 /*
  * Allocate a test buffer, freeing any existing buffer.
