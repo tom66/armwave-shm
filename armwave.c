@@ -947,6 +947,7 @@ int main()
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
     
+    /*
     for(n = 0; n < yuv_image->num_planes; n++) {
         printf("yuv_image plane %d offset %d pitch %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
     }
@@ -955,13 +956,14 @@ int main()
         printf("Error: Fatal X11: XShmAttached failed\n", ret);
         exit (-1);
     }
+    */
     
-    printf("%d\n", yuv_image->data_size);
+    printf("%d\n", g_yuv_image->data_size);
     
     // first iter
     armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
     armwave_generate();
-    armwave_fill_xvimage_scaled(yuv_image);
+    armwave_fill_xvimage_scaled(g_yuv_image);
         
     XSetForeground(g_dpy, gc, grat_colour.pixel);
         
@@ -970,13 +972,13 @@ int main()
     while (1) {
         armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
         armwave_generate();
-        armwave_fill_xvimage_scaled(yuv_image);
+        armwave_fill_xvimage_scaled(g_yuv_image);
         
         num += 1;
         XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
         XvShmPutImage(g_dpy, xv_port, g_window, gc, yuv_image,
-            0, 0, yuv_image->width, yuv_image->height,
+            0, 0, g_yuv_image->width, g_yuv_image->height,
             0, 0, _w, _h, True);
         
         for(i = 0; i < (_w / 12.0f); i++) {
