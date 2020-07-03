@@ -203,8 +203,8 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
         case PLT_RAINBOW_THERMAL:
             for(v = 0; v < 256; v++) {
                 hsv_temp.h = (360.0f / 255.0f) * v;
-                hsv_temp.s = 1.0f;
-                hsv_temp.v = 1.0f;
+                hsv_temp.s = 0.5f;
+                hsv_temp.v = 0.5f;
                 
                 printf("%3d = [%.2f, %.2f, %.2f]\n", v, hsv_temp.h, hsv_temp.s, hsv_temp.v);
                 
