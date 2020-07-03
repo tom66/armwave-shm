@@ -992,7 +992,7 @@ int main()
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(dpy, xswa.colormap, &grat_colour);
     
-    yuv_image = XvShmCreateImage(dpy, xv_port, GUID_YUV12_PLANAR, 0, yuv_width, yuv_height, &yuv_shminfo);
+    yuv_image = XvShmCreateImage(dpy, xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
     yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
     yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
     yuv_shminfo.readOnly = False;
