@@ -878,7 +878,6 @@ int main()
     printf("X11 Window: %d (0x%08x)\n", window, window);
     
     armwave_grab_xid(window);
-    //armwave_grab_xid(window);
     
     /*
      * Try to strip decoration from window.
@@ -895,6 +894,7 @@ int main()
     /*
      * Query the MITSHM extension - check it is available.
      */
+    /*
     if (XShmQueryExtension(g_dpy)) {
         shmem_flag = 1;
     }
@@ -930,18 +930,22 @@ int main()
         exit(-1);
     }
     
+    yuv_image = XvShmCreateImage(g_dpy, xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
+    yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
+    yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    yuv_shminfo.readOnly = False;
+    
     gc = XCreateGC(g_dpy, g_window, 0, 0);
+    */
+    
+    armwave_init_xvimage_shared(tex_width, yuv_height);
+    
     
     grat_colour.red = 18000;
     grat_colour.green = 18000;
     grat_colour.blue = 18000;
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
-    
-    yuv_image = XvShmCreateImage(g_dpy, xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
-    yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
-    yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
-    yuv_shminfo.readOnly = False;
     
     for(n = 0; n < yuv_image->num_planes; n++) {
         printf("yuv_image plane %d offset %d pitch %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
