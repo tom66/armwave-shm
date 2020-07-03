@@ -669,7 +669,15 @@ void armwave_init_x11()
         printf("Error: Fatal X11: not supported 24-bit TrueColor display.\n");
         exit(-1);
     }
-        
+}
+
+/*
+ * Create the shared memory buffer for the XvImage.
+ */
+void armwave_init_xvimage_shared(int tex_width, int tex_height)
+{
+    XShmSegmentInfo	yuv_shminfo;
+    
     /*
      * Query the MITSHM extension - check it is available.
      */
@@ -699,16 +707,10 @@ void armwave_init_x11()
         printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
         exit(-1);
     }
-}
-
-/*
- * Create the shared memory buffer for the XvImage.
- */
-void armwave_init_xvimage_shared(int tex_width, int tex_height)
-{
-    XShmSegmentInfo	yuv_shminfo;
     
-    // Create the shared image
+    /*
+     * Create the shared image and attach to it.
+     */
     printf("Attaching XvShm...\n");
     
     if(g_yuv_image != NULL) {
