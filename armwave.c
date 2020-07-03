@@ -206,10 +206,10 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
                 hsv_temp.s = 0.5f;
                 hsv_temp.v = 0.5f;
                 
-                printf("%3d = [%.2f, %.2f, %.2f]\n", v, hsv_temp.h, hsv_temp.s, hsv_temp.v);
-                
                 hsv2rgb(&hsv_temp, &rgb_temp);
                 rgb2yuv(&rgb_temp, &yuv_lut[v]); 
+                
+                printf("%3d = [%.2f, %.2f, %.2f] RGB: %3d, %3d, %3d\n", v, hsv_temp.h, hsv_temp.s, hsv_temp.v, rgb_temp.r, rgb_temp.g, rgb_temp.b);
             }
             break;
     }
