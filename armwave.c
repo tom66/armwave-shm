@@ -752,7 +752,7 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
  * http://bellet.info/XVideo/testxv.c
  */
 #ifdef NO_PYTHON
-int main()
+int main2()
 {
     int	yuv_width = 2048;
     int	yuv_height = 256;
@@ -896,6 +896,261 @@ int main()
         */
         
         /* XFlush(g_dpy); */
+         
+        if(num % stat_rate == 0) {
+            end = clock();
+            time_elapsed = ((float)(end - start)) / CLOCKS_PER_SEC;
+            printf("%d frames (%6d total) took %.2f ms (%.1f fps, %.1f waves/sec)\n", \
+                stat_rate, num, time_elapsed * 1000, ((float)stat_rate) / time_elapsed,
+                (((float)stat_rate) / time_elapsed) * g_armwave_state.waves_max);
+            
+            start = clock();
+        }
+            
+        //time(&secsb);
+        //printf("%ld frames in %ld seconds; %.4f fps\n", frames, secsb-secsa, (double) frames/(secsb-secsa));
+    }
+    
+    return 0;
+}
+
+
+int main()
+{
+    int	yuv_width = 2048;
+    int	yuv_height = 256;
+    
+    int tex_width = 512;
+    
+    int	xv_port = -1;
+    int	adaptor = -1, encodings, attributes, formats;
+    int	i, j, ret, p, _d, _w, _h, n;
+    long secsb, secsa, frames;
+    
+    XvAdaptorInfo *ai;
+    XvEncodingInfo *ei;
+    XvAttribute	*at;
+    XvImageFormatValues	*fo;
+    XvImage	*yuv_image;
+
+    unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
+    int	p_num_adaptors;
+     	
+    Display	*dpy;
+    Window	window, _dw;
+    XSizeHints hint;
+    XSetWindowAttributes xswa;
+    XVisualInfo	vinfo;
+    int	screen;
+    unsigned long mask;
+    XEvent event;
+    GC gc;
+    int shmem_flag = 0;
+    XShmSegmentInfo	yuv_shminfo;
+    int	CompletionType;
+    
+    int p_num_formats;
+    XvImageFormatValues *img_fmts;
+    
+    struct armwave_yuv_t grat_col;
+    struct armwave_yuv_t yuv_col;
+    struct armwave_rgb_t grat_rgb_col;
+    struct armwave_rgb_t rgb_col;
+    int num = 0;
+    int n_test_waves = 8;
+    
+    clock_t start, end;
+    float time_elapsed;
+    int stat_rate = 10;
+    
+    XColor grat_colour;
+    
+    yuv_col.y = 255;
+    yuv_col.u = 127;
+    yuv_col.v = 127;
+    
+    grat_rgb_col.r = 127;
+    grat_rgb_col.g = 127;
+    grat_rgb_col.b = 127;
+    
+    //rgb2yuv(&grat_rgb_col, &grat_col);
+    
+    printf("Starting up testapp...\n\n");
+    
+    /*
+     * Try to open the display.
+     */
+    dpy = XOpenDisplay(NULL);
+    if (dpy == NULL) {
+        printf("Cannot open display.\n");
+        exit (-1);
+    }
+    
+    screen = DefaultScreen(dpy);
+    
+    /*
+     * Set up the renderer.
+     */
+    printf("Preparing test waveforms...\n");
+    armwave_setup_render(0, tex_width, 1024, tex_width, tex_width, 256, 0);
+    armwave_set_channel_colour(1, 255, 178, 25, 10.0f);
+    armwave_prep_yuv_palette(PLT_RAINBOW_THERMAL, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
+    armwave_test_create_am_sine(0.25, 1e-5, n_test_waves);
+    printf("Done, starting XVideo...\n");
+    
+    /*
+     * Check the display supports 24-bit TrueColor, if not then abort early.
+     */
+    if (XMatchVisualInfo(dpy, screen, 24, TrueColor, &vinfo)) {
+        printf("Found 24bit TrueColor.\n");
+    } else {
+        printf("Error: Fatal X11: not supported 24-bit TrueColor display.\n");
+        exit(-1);
+    }
+    
+    /*
+     * Create the window and map it, then wait for it to send us a map event.
+     */
+    CompletionType = -1;	
+    hint.x = 1;
+    hint.y = 1;
+    hint.width = yuv_width;
+    hint.height = yuv_height;
+    hint.flags = PPosition | PSize;
+    
+    xswa.colormap = XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
+    xswa.event_mask = StructureNotifyMask | ExposureMask;
+    xswa.background_pixel = 0;
+    xswa.border_pixel = 0;
+    
+    mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
+    
+    window = XCreateWindow(dpy, DefaultRootWindow(dpy),
+			 0, 0,
+			 yuv_width,
+			 yuv_height,
+			 0, vinfo.depth,
+			 InputOutput,
+			 vinfo.visual,
+			 mask, &xswa);
+    
+    printf("X11 Window: %d (0x%08x)\n", window, window);
+    
+    XStoreName(dpy, window, "ArmWave");
+    XSetIconName(dpy, window, "ArmWave");
+    XSelectInput(dpy, window, StructureNotifyMask);
+    
+    XMapWindow(dpy, window);
+    
+    do {
+        XNextEvent(dpy, &event);
+    }
+    while (event.type != MapNotify || event.xmap.event != window);
+    
+    /*
+     * Try to strip decoration from window.
+     */
+    /*
+    Atom mwmHintsProperty = XInternAtom(dpy, "_MOTIF_WM_HINTS", 0);
+    struct MwmHints hints;
+    hints.flags = MWM_HINTS_DECORATIONS;
+    hints.decorations = 0;
+    XChangeProperty(dpy, window, mwmHintsProperty, mwmHintsProperty, 32,
+            PropModeReplace, (unsigned char *)&hints, 5);
+    */
+    
+    /*
+     * Query the MITSHM extension - check it is available.
+     */
+    if (XShmQueryExtension(dpy)) {
+        shmem_flag = 1;
+    }
+    
+    if (!shmem_flag) {
+        printf("Error: Fatal X11: Shared memory extension not available or failed to allocate shared memory.\n");
+        exit(-1);
+    }
+    
+    if (shmem_flag == 1) {
+        CompletionType = XShmGetEventBase(dpy) + ShmCompletion;
+    }
+    
+    ret = XvQueryExtension(dpy, &p_version, &p_release, &p_request_base,
+			 &p_event_base, &p_error_base);
+    if (ret != Success) {
+        printf("Error: Fatal X11: Unable to find XVideo extension (%d).  Is it configured correctly?\n", ret);
+        exit(-1);
+    }
+    
+    ret = XvQueryAdaptors(dpy, DefaultRootWindow(dpy),
+			&p_num_adaptors, &ai);
+    
+    if (ret != Success) {
+        printf("Error: Fatal X11: Unable to query XVideo extension (%d).  Is it configured correctly?\n", ret);
+        exit(-1);
+    }
+    
+    // Use the last port available
+    xv_port = ai[p_num_adaptors - 1].base_id;
+    if(xv_port == -1) {
+        printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
+        exit(-1);
+    }
+    
+    gc = XCreateGC(dpy, window, 0, 0);
+    
+    grat_colour.red = 18000;
+    grat_colour.green = 18000;
+    grat_colour.blue = 18000;
+    grat_colour.flags = DoRed | DoGreen | DoBlue;
+    XAllocColor(dpy, xswa.colormap, &grat_colour);
+    
+    yuv_image = XvShmCreateImage(dpy, xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
+    yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
+    yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    yuv_shminfo.readOnly = False;
+    
+    for(n = 0; n < yuv_image->num_planes; n++) {
+        printf("yuv_image plane %d offset %d pitch %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
+    }
+    
+    if (!XShmAttach(dpy, &yuv_shminfo)) {
+        printf("Error: Fatal X11: XShmAttached failed\n", ret);
+        exit (-1);
+    }
+    
+    printf("%d\n", yuv_image->data_size);
+    
+    // first iter
+    armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
+    armwave_generate();
+    armwave_fill_xvimage_scaled(yuv_image);
+        
+    XSetForeground(dpy, gc, grat_colour.pixel);
+        
+    start = clock();
+    
+    while (1) {
+        armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
+        armwave_generate();
+        armwave_fill_xvimage_scaled(yuv_image);
+        
+        num += 1;
+        XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
+        
+        XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
+            0, 0, yuv_image->width, yuv_image->height,
+            0, 0, _w, _h, True);
+        
+        for(i = 0; i < (_w / 12.0f); i++) {
+            XDrawLine(dpy, window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
+        }
+        
+        for(i = 0; i < (_h / 8.0f); i++) {
+            XDrawLine(dpy, window, gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
+        }
+        
+        /* XFlush(dpy); */
          
         if(num % stat_rate == 0) {
             end = clock();
