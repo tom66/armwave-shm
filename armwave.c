@@ -885,7 +885,7 @@ int main()
     hint.height = yuv_height;
     hint.flags = PPosition | PSize;
     
-    xswa.colormap =  XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
+    xswa.colormap = XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
     xswa.border_pixel = 0;
@@ -900,6 +900,8 @@ int main()
 			 InputOutput,
 			 vinfo.visual,
 			 mask, &xswa);
+    
+    printf("X11 Window: %d (0x%08x)\n", window, window);
     
     XStoreName(dpy, window, "ArmWave");
     XSetIconName(dpy, window, "ArmWave");
