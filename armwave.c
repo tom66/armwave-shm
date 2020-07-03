@@ -1057,7 +1057,7 @@ int main()
          
         if(num % stat_rate == 0) {
             end = clock();
-            time_elapsed = (end - start) / CLOCKS_PER_SEC;
+            time_elapsed = ((float)(end - start)) / CLOCKS_PER_SEC;
             printf("%d frames (%6d total) %6d %6d took %.2f ms (%.1f fps)\n", stat_rate, num, start, end, time_elapsed * 1000, ((float)stat_rate) / time_elapsed);
             
             start = clock();
