@@ -57,6 +57,7 @@ int g_xv_port;
 XVisualInfo	g_vinfo;
 GC g_gc = NULL;
 XvImage *g_yuv_image = NULL;
+XShmSegmentInfo g_yuv_shminfo;
     
 struct MwmHints {
     unsigned long flags;
@@ -674,7 +675,6 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
 {
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
     int	p_num_adaptors, ret, n;
-    XShmSegmentInfo	yuv_shminfo;
     XvAdaptorInfo *ai;
     
     /*
@@ -720,10 +720,10 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
         g_yuv_image = NULL;
     }
     
-    g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
-    yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
-    yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
-    yuv_shminfo.readOnly = False;
+    g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &g_yuv_shminfo);
+    g_yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
+    g_yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    g_yuv_shminfo.readOnly = False;
     
     for(n = 0; n < g_yuv_image->num_planes; n++) {
         printf("yuv_image plane %d offset %d pitch %d\n", n, g_yuv_image->offsets[n], g_yuv_image->pitches[n]);
@@ -734,7 +734,7 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
         exit (-1);
     }
     
-    printf("%d bytes for XvImage, shmid %d, xv_port %d\n", g_yuv_image->data_size, yuv_shminfo.shmid, g_xv_port);
+    printf("%d bytes for XvImage, shmid %d, xv_port %d\n", g_yuv_image->data_size, g_yuv_shminfo.shmid, g_xv_port);
     
     // Create the GC
     if(g_gc != NULL) {
