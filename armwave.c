@@ -990,6 +990,10 @@ int main()
     
     printf("%d\n", yuv_image->data_size);
     
+    // first iter
+    armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
+    armwave_generate();
+        
     start = clock();
     
     while (1) {
