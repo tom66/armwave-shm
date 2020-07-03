@@ -134,27 +134,12 @@ void armwave_set_wave_pointer_as_testbuf(int set);
 void armwave_set_wave_pointer_u32(uint32_t wave_buffer_ptr);
 void armwave_set_channel_colour(int ch, int r, int g, int b, float i);
 void armwave_clear_buffer(uint32_t flags);
-//void armwave_fill_pixbuf_256(uint32_t *out_buffer);
-void armwave_fill_pixbuf_scaled(uint32_t *out_buffer);
-
-#ifndef NO_PYTHON
-PyObject *armwave_fill_pixbuf_into_pybuffer(PyObject *buf_obj);
-#endif
 
 void armwave_dump_ppm_debug(uint32_t *buffer, char *fn);
 
 //void armwave_test_create_square(float noise_fraction);
+void armwave_test_buffer_alloc(int nsets);
 void armwave_test_create_am_sine(float mod, float noise_fraction, int sets);
-
-void armwave_test_init(int wave_size, int nwaves, int render_width, int render_height);
-void armwave_test_buffer_alloc();
-void armwave_test_fill_outbuf(void);
-
-#ifndef NO_PYTHON
-void armwave_test_fill_gdkbuf(PyObject *buf);
-#endif
-
-void armwave_test_dump_buffer_to_ppm(char *fn);
 
 void armwave_generate(void);
 void armwave_cleanup(void);

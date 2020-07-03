@@ -48,6 +48,9 @@ struct armwave_yuv_t yuv_lut[256];
 
 const struct armwave_rgb_t fill_black = { 0, 0, 0 };
 
+Window g_window_id = 0;
+Display *g_dpy;
+
 struct MwmHints {
     unsigned long flags;
     unsigned long functions;
@@ -598,6 +601,33 @@ void armwave_cleanup()
 }
 
 /*
+ * Grab a given XWindow by ID.
+ */
+void armwave_grab_xid(int id)
+{
+    if(g_window_id != 0) {
+        XUnmapWindow(g_window_id);
+    }
+    
+    g_window_id = id;
+    
+    XStoreName(g_dpy, g_window_id, "ArmWave");
+    XSetIconName(g_dpy, g_window_id, "ArmWave");
+    XSelectInput(g_dpy, g_window_id, StructureNotifyMask);
+    
+    XMapWindow(g_dpy, g_window_id);
+    
+    do {
+        XNextEvent(dg_py, &event);
+    }
+    while (event.type != MapNotify || event.xmap.event != g_window_id);
+}
+
+/*
+ * Run one rendering tick.
+ */
+
+/*
  * Main entry point for the testcase.  Based on:
  * http://bellet.info/XVideo/testxv.c
  */
@@ -667,13 +697,13 @@ int main()
     /*
      * Try to open the display.
      */
-    dpy = XOpenDisplay(NULL);
-    if (dpy == NULL) {
+    g_dpy = XOpenDisplay(NULL);
+    if (g_dpy == NULL) {
         printf("Cannot open display.\n");
         exit (-1);
     }
     
-    screen = DefaultScreen(dpy);
+    screen = DefaultScreen(g_dpy);
     
     /*
      * Set up the renderer.
@@ -688,7 +718,7 @@ int main()
     /*
      * Check the display supports 24-bit TrueColor, if not then abort early.
      */
-    if (XMatchVisualInfo(dpy, screen, 24, TrueColor, &vinfo)) {
+    if (XMatchVisualInfo(g_dpy, screen, 24, TrueColor, &vinfo)) {
         printf("Found 24bit TrueColor.\n");
     } else {
         printf("Error: Fatal X11: not supported 24-bit TrueColor display.\n");
@@ -705,14 +735,14 @@ int main()
     hint.height = yuv_height;
     hint.flags = PPosition | PSize;
     
-    xswa.colormap = XCreateColormap(dpy, DefaultRootWindow(dpy), vinfo.visual, AllocNone);
+    xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
     xswa.border_pixel = 0;
     
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
     
-    window = XCreateWindow(dpy, DefaultRootWindow(dpy),
+    window = XCreateWindow(g_dpy, DefaultRootWindow(g_dpy),
 			 0, 0,
 			 yuv_width,
 			 yuv_height,
@@ -723,33 +753,24 @@ int main()
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
     
-    XStoreName(dpy, window, "ArmWave");
-    XSetIconName(dpy, window, "ArmWave");
-    XSelectInput(dpy, window, StructureNotifyMask);
-    
-    XMapWindow(dpy, window);
-    
-    do {
-        XNextEvent(dpy, &event);
-    }
-    while (event.type != MapNotify || event.xmap.event != window);
+    armwave_grab_xid(window);
     
     /*
      * Try to strip decoration from window.
      */
     /*
-    Atom mwmHintsProperty = XInternAtom(dpy, "_MOTIF_WM_HINTS", 0);
+    Atom mwmHintsProperty = XInternAtom(g_dpy, "_MOTIF_WM_HINTS", 0);
     struct MwmHints hints;
     hints.flags = MWM_HINTS_DECORATIONS;
     hints.decorations = 0;
-    XChangeProperty(dpy, window, mwmHintsProperty, mwmHintsProperty, 32,
+    XChangeProperty(g_dpy, g_window, mwmHintsProperty, mwmHintsProperty, 32,
             PropModeReplace, (unsigned char *)&hints, 5);
     */
     
     /*
      * Query the MITSHM extension - check it is available.
      */
-    if (XShmQueryExtension(dpy)) {
+    if (XShmQueryExtension(g_dpy)) {
         shmem_flag = 1;
     }
     
@@ -759,17 +780,17 @@ int main()
     }
     
     if (shmem_flag == 1) {
-        CompletionType = XShmGetEventBase(dpy) + ShmCompletion;
+        CompletionType = XShmGetEventBase(g_dpy) + ShmCompletion;
     }
     
-    ret = XvQueryExtension(dpy, &p_version, &p_release, &p_request_base,
+    ret = XvQueryExtension(g_dpy, &p_version, &p_release, &p_request_base,
 			 &p_event_base, &p_error_base);
     if (ret != Success) {
         printf("Error: Fatal X11: Unable to find XVideo extension (%d).  Is it configured correctly?\n", ret);
         exit(-1);
     }
     
-    ret = XvQueryAdaptors(dpy, DefaultRootWindow(dpy),
+    ret = XvQueryAdaptors(g_dpy, DefaultRootWindow(g_dpy),
 			&p_num_adaptors, &ai);
     
     if (ret != Success) {
@@ -784,15 +805,15 @@ int main()
         exit(-1);
     }
     
-    gc = XCreateGC(dpy, window, 0, 0);
+    gc = XCreateGC(g_dpy, g_window, 0, 0);
     
     grat_colour.red = 18000;
     grat_colour.green = 18000;
     grat_colour.blue = 18000;
     grat_colour.flags = DoRed | DoGreen | DoBlue;
-    XAllocColor(dpy, xswa.colormap, &grat_colour);
+    XAllocColor(g_dpy, xswa.colormap, &grat_colour);
     
-    yuv_image = XvShmCreateImage(dpy, xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
+    yuv_image = XvShmCreateImage(g_dpy, xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
     yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
     yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
     yuv_shminfo.readOnly = False;
@@ -801,7 +822,7 @@ int main()
         printf("yuv_image plane %d offset %d pitch %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
     }
     
-    if (!XShmAttach(dpy, &yuv_shminfo)) {
+    if (!XShmAttach(g_dpy, &yuv_shminfo)) {
         printf("Error: Fatal X11: XShmAttached failed\n", ret);
         exit (-1);
     }
@@ -813,7 +834,7 @@ int main()
     armwave_generate();
     armwave_fill_xvimage_scaled(yuv_image);
         
-    XSetForeground(dpy, gc, grat_colour.pixel);
+    XSetForeground(g_dpy, gc, grat_colour.pixel);
         
     start = clock();
     
@@ -823,21 +844,21 @@ int main()
         armwave_fill_xvimage_scaled(yuv_image);
         
         num += 1;
-        XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
+        XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
-        XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
+        XvShmPutImage(g_dpy, xv_port, g_window, gc, yuv_image,
             0, 0, yuv_image->width, yuv_image->height,
             0, 0, _w, _h, True);
         
         for(i = 0; i < (_w / 12.0f); i++) {
-            XDrawLine(dpy, window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
+            XDrawLine(g_dpy, g_window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
         }
         
         for(i = 0; i < (_h / 8.0f); i++) {
-            XDrawLine(dpy, window, gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
+            XDrawLine(g_dpy, g_window, gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
         }
         
-        /* XFlush(dpy); */
+        /* XFlush(g_dpy); */
          
         if(num % stat_rate == 0) {
             end = clock();
