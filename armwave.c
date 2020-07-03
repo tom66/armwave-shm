@@ -709,8 +709,8 @@ void armwave_init_x11(int tex_width, int tex_height)
     }
     
     g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
-    yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
-    yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
+    yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
     yuv_shminfo.readOnly = False;
     
     if (!XShmAttach(g_dpy, &yuv_shminfo)) {
@@ -793,7 +793,7 @@ int main()
     armwave_prep_yuv_palette(PLT_RAINBOW_THERMAL, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.25, 1e-5, n_test_waves);
     
-    armwave_init_x11();
+    armwave_init_x11(tex_width, yuv_height);
     
     /*
      * Create the window and map it.
