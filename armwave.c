@@ -612,6 +612,7 @@ void armwave_cleanup()
  */
 void armwave_grab_xid(int id)
 {
+    XShmSegmentInfo	yuv_shminfo;
     XEvent event;
     
     if(g_window != 0) {
@@ -629,7 +630,7 @@ void armwave_grab_xid(int id)
     do {
         XNextEvent(g_dpy, &event);
     }
-    while (event.type != MapNotify || event.xmap.event != g_window);
+    while(event.type != MapNotify || event.xmap.event != g_window);
     
     // Create the GC
     if(g_gc != NULL) {
@@ -650,7 +651,7 @@ void armwave_grab_xid(int id)
     yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
     yuv_shminfo.readOnly = False;
     
-    if (!XShmAttach(g_dpy, &yuv_shminfo)) {
+    if(!XShmAttach(g_dpy, &yuv_shminfo)) {
         printf("Error: Fatal X11: XShmAttached failed\n", ret);
         exit (-1);
     }
@@ -663,7 +664,6 @@ void armwave_grab_xid(int id)
  */
 void armwave_init_x11(int tex_width, int tex_height)
 {
-    XShmSegmentInfo	yuv_shminfo;
     XvAdaptorInfo *ai;
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
     int	p_num_adaptors, screen, ret;
