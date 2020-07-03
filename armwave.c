@@ -610,9 +610,8 @@ void armwave_cleanup()
 /*
  * Grab a given XWindow by ID.
  */
-void armwave_grab_xid(int id, int tex_width, int tex_height)
+void armwave_grab_xid(int id)
 {
-    XShmSegmentInfo	yuv_shminfo;
     XEvent event;
     
     if(g_window != 0) {
@@ -707,6 +706,8 @@ void armwave_init_x11()
  */
 void armwave_init_xvimage_shared(int tex_width, int tex_height)
 {
+    XShmSegmentInfo	yuv_shminfo;
+    
     // Create the shared image
     printf("Attaching XvShm...\n");
     
