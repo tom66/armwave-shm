@@ -796,7 +796,7 @@ void armwave_render_graticule()
         }
         
         gr_size = (h / 8.0f);
-        for(i = 0; i < 8; i++, p += gr_size) {
+        for(i = 0, p = m; i < 8; i++, p += gr_size) {
             XDrawLine(g_dpy, g_window, g_gc, m, p, w, p);
         }
     }
