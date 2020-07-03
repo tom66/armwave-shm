@@ -813,6 +813,8 @@ int main()
     int	yuv_width = 2048;
     int	yuv_height = 256;
     
+    int tex_width = 2048;
+    
     int	xv_port = -1;
     int	adaptor = -1, encodings, attributes, formats;
     int	i, j, ret, p, _d, _w, _h, n;
@@ -879,7 +881,7 @@ int main()
      * Set up the renderer.
      */
     printf("Preparing test waveforms...\n");
-    armwave_setup_render(0, 1536, 256, 1536, 1536, 256, 0);
+    armwave_setup_render(0, tex_width, 256, tex_width, tex_width, 256, 0);
     armwave_set_channel_colour(1, 255, 178, 25, 10.0f);
     armwave_prep_yuv_palette(0, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.25, 1e-5, n_test_waves);
