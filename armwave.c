@@ -749,7 +749,7 @@ int main()
     XvAttribute	*at;
     XvImageFormatValues	*fo;
      	
-    Window	_dw;
+    Window window, _dw;
     XSetWindowAttributes xswa;
     int	screen;
     unsigned long mask;
