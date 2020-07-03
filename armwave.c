@@ -765,7 +765,6 @@ int main()
     int	i, j, ret, p, _d, _w, _h, n;
      	
     Window	window, _dw;
-    XSizeHints hint;
     XSetWindowAttributes xswa;
     XVisualInfo	vinfo;
     unsigned long mask;
@@ -808,13 +807,6 @@ int main()
     /*
      * Create the window and map it, then wait for it to send us a map event.
      */
-    CompletionType = -1;	
-    hint.x = 1;
-    hint.y = 1;
-    hint.width = yuv_width;
-    hint.height = yuv_height;
-    hint.flags = PPosition | PSize;
-    
     xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), g_vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
