@@ -89,6 +89,22 @@ void __attribute__((always_inline)) plot_pixel_yuv(XvImage *img, int x, int y, s
 }
 
 /*
+ * Demo/helper function to plot YUV pixel on XvImage canvas.  Does not write
+ * U/V values if x or y are odd.
+ */
+void __attribute__((always_inline)) plot_pixel_yuv_fastq(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
+{
+    int uv_base = img->width * img->height;
+    
+    img->data[(img->width * y) + x] = yuv_in->y; 
+    
+    if(!(x & 1) && !(y & 1)) {
+        img->data[img->offsets[1] + (img->pitches[1] * (y / 2)) + (x / 2)] = yuv_in->v;
+        img->data[img->offsets[2] + (img->pitches[2] * (y / 2)) + (x / 2)] = yuv_in->u;
+    }
+}
+
+/*
  * Fill an XvImage canvas with an RGB value.
  */
 void fill_rgb_xvimage(XvImage *img, struct armwave_rgb_t *rgb)
@@ -366,7 +382,7 @@ void armwave_fill_xvimage_scaled(XvImage *img)
                         //printf("0x%08x,%6d,%6d,%6d,%6d,%4d,%.3f\n", out_buffer_base, offset, xx, y, n, g_armwave_state.target_width, g_armwave_state.vscale_frac);
                         //*(out_buffer_base + offset) = word;
                         //printf("%6d,%6d,%6d\n", xx, yy, value);
-                        plot_pixel_yuv(img, xx, yy, &yuv_lut[MIN(value, 255)]);
+                        plot_pixel_yuv_fastq(img, xx, yy, &yuv_lut[MIN(value, 255)]);
                         painted++;
                     }
                 }
