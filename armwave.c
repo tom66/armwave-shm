@@ -825,7 +825,6 @@ int main()
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
     armwave_grab_xid(window);
-    armwave_init_xvimage_shared(tex_width, yuv_height);
     
     /*
      * Try to strip decoration from window.
@@ -844,6 +843,8 @@ int main()
     grat_colour.blue = 18000;
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
+    
+    armwave_init_xvimage_shared(tex_width, yuv_height);
     
     // first iter
     armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
