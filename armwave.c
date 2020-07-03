@@ -52,6 +52,8 @@ const struct armwave_rgb_t g_fill_black = { 0, 0, 0 };
  * X11 properties.  Should these be commoned into one struct?
  */ 
 struct armwave_canvas_dims_t g_canvas_dims;
+struct armwave_canvas_dims_t g_canvas_dims_last;
+
 int g_frame_num, g_n_test_waves;
 Window g_window = 0;
 Display *g_dpy;
@@ -812,6 +814,12 @@ void armwave_render_frame_x11()
     XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
     g_canvas_dims.w = _w;
     g_canvas_dims.h = _h;
+    
+    if(g_canvas_dims_last != g_canvas_dims) {
+        XClearWindow(g_window);
+    }
+    
+    g_canvas_dims_last = g_canvas_dims;
     
     XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
         0, 0, g_yuv_image->width, g_yuv_image->height,
