@@ -722,7 +722,7 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
     
     g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &g_yuv_shminfo);
     g_yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
-    g_yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    g_yuv_shminfo.shmaddr = g_yuv_image->data = shmat(g_yuv_shminfo.shmid, 0, 0);
     g_yuv_shminfo.readOnly = False;
     
     for(n = 0; n < g_yuv_image->num_planes; n++) {
