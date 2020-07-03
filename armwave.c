@@ -51,6 +51,7 @@ const struct armwave_rgb_t g_fill_black = { 0, 0, 0 };
 /*
  * X11 properties.  Should these be commoned into one struct?
  */ 
+struct armwave_canvas_dims_t g_canvas_dims;
 int g_frame_num, g_n_test_waves;
 Window g_window = 0;
 Display *g_dpy;
@@ -745,6 +746,24 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
 }
 
 /*
+ * Render the graticule.
+ */
+void armwave_render_graticule()
+{
+    int w, h;
+    w = g_canvas_dims.w;
+    h = g_canvas_dims.h;
+    
+    for(i = 0; i < (w / 12.0f); i++) {
+        XDrawLine(g_dpy, g_window, g_gc, (w / 12.0f) * i, 0, (w / 12.0f) * i, h);
+    }
+    
+    for(i = 0; i < (h / 8.0f); i++) {
+        XDrawLine(g_dpy, g_window, g_gc, 0, (h / 8.0f) * i, w, (h / 8.0f) * i);
+    }
+}
+
+/*
  * Run one rendering tick.
  */
 void armwave_render_frame_x11()
@@ -757,10 +776,14 @@ void armwave_render_frame_x11()
     armwave_fill_xvimage_scaled(g_yuv_image);
     
     XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
+    g_canvas_dims.w = _w;
+    g_canvas_dims.h = _h;
     
     XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
         0, 0, g_yuv_image->width, g_yuv_image->height,
         0, 0, _w, _h, True);
+    
+    armwave_render_graticule();
 }
 
 /*
@@ -846,8 +869,6 @@ int main()
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
     
-    // first iter
-        
     XSetForeground(g_dpy, g_gc, grat_colour.pixel);
     
     armwave_render_frame_x11();
@@ -859,13 +880,6 @@ int main()
         g_frame_num += 1;
         
         /*
-        for(i = 0; i < (_w / 12.0f); i++) {
-            XDrawLine(g_dpy, g_window, g_gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
-        }
-        
-        for(i = 0; i < (_h / 8.0f); i++) {
-            XDrawLine(g_dpy, g_window, g_gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
-        }
         */
         
         /* XFlush(g_dpy); */

@@ -63,6 +63,10 @@ struct armwave_hsv_t {
     uint8_t h, s, v;
 };
 
+struct armwave_canvas_dims_t {
+    int w, h;
+}
+
 struct armwave_state_t {
   uint32_t flags;
 
