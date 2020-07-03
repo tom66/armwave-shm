@@ -372,18 +372,12 @@ void armwave_fill_xvimage_scaled(XvImage *img)
                 if(value != 0) {
                     // Plot the pixels
                     nsub = n + w;
-                    yy = (nsub & 0xff); // * g_armwave_state.vscale_frac;
-                    ye = ((nsub & 0xff) + 1); // * g_armwave_state.vscale_frac;
+                    yy = (nsub & 0xff); 
                     xx = (nsub >> 8) / 2;
 
-                    for(y = yy; y < ye; y++) {
-                        //offset = (xx + ((g_armwave_state.target_height - y) * g_armwave_state.target_width)); 
-                        //printf("0x%08x,%6d,%6d,%6d,%6d,%4d,%.3f\n", out_buffer_base, offset, xx, y, n, g_armwave_state.target_width, g_armwave_state.vscale_frac);
-                        //*(out_buffer_base + offset) = word;
-                        //printf("%6d,%6d,%6d\n", xx, yy, value);
-                        plot_pixel_yuv_fastq(img, xx, yy, &yuv_lut[MIN(value, 255)]);
-                        painted++;
-                    }
+                    // FASTQ does not paint U/V for odd pixels; works OK for most purposes.
+                    plot_pixel_yuv_fastq(img, xx, yy, &yuv_lut[MIN(value, 255)]);
+                    painted++;
                 }
             }
         }
@@ -400,19 +394,17 @@ void armwave_generate()
     uint32_t yy;
     uint32_t xx_rem = g_armwave_state.wave_length, ypos = 0;
 
+    // Zero the buffer
     memset(g_armwave_state.ch1_buffer, 0, g_armwave_state.ch_buff_size);
 
+    // Render the main slices
     for(yy = 0; yy < (g_armwave_state.wave_length / g_armwave_state.slice_height); yy++) {
-    //for(yy = 0; yy < 10; yy++) {
-        //printf("armwave_generate: slice %d (y=%d, h=%d, xpos=%d)\n", \
-            yy, yy * g_armwave_state.slice_height, g_armwave_state.slice_height, \
-            (yy * g_armwave_state.slice_height * g_armwave_state.cmp_x_bitdepth_scale) >> AM_XCOORD_MULT_SHIFT);
-
         render_nonaa_to_buffer_1ch_slice(yy * g_armwave_state.slice_height, g_armwave_state.slice_height);
         xx_rem -= g_armwave_state.slice_height;
         ypos += g_armwave_state.slice_height;   
     }
 
+    // Render whatever is left over
     render_nonaa_to_buffer_1ch_slice(ypos, xx_rem);
 }
 
@@ -426,26 +418,10 @@ void armwave_setup_render(uint32_t start_point, uint32_t end_point, uint32_t wav
 
     printf("s=%d e=%d w=%d ws=%d tw=%d th=%d rf=0x%08x\n", start_point, end_point, waves_max, wave_stride, target_width, target_height, render_flags);
 
-    // TODO these asserts should instead raise PyExc
-    assert(start_point < end_point);
-
-    /*
-    // target_height must be a power of two.  Only 256, 512, 1024 and 2048 height buffers are supported.
-    assert(target_height == 256 || target_height == 512 || target_height == 1024 || target_height == 2048);
-    if(target_height == 256) {
-        g_armwave_state.row_shift = 8;
-        g_armwave_state.row_mask = 0x0ff;
-    } else if(target_height == 512) {
-        g_armwave_state.row_shift = 9;
-        g_armwave_state.row_mask = 0x1ff;
-    } else if(target_height == 1024) {
-        g_armwave_state.row_shift = 10;
-        g_armwave_state.row_mask = 0x3ff;
-    } else if(target_height == 2048) {
-        g_armwave_state.row_shift = 11;
-        g_armwave_state.row_mask = 0x7ff;
+    if(start_point < end_point) {
+        printf("Error: start point less than end point\n");
+        return;
     }
-    */
 
     // Calculate the size of each buffer.  Buffers are rotated by 90 degrees to improve cache coherency.
     g_armwave_state.xstride = target_height;
@@ -570,48 +546,6 @@ void armwave_set_channel_colour(int ch, int r, int g, int b, float i)
 }
 
 /*
- * Dump a ppm of a buffer to a file.
- */
-void armwave_dump_ppm_debug(uint32_t *buffer, char *fn)
-{
-    FILE *fp = fopen(fn, "wb");
-    uint32_t data;
-    int xx, yy;
-
-    //printf("in_buffer=0x%08x\n", buffer);
-
-    fputs("P3\n", fp);
-    fprintf(fp, "%d %d\n", g_armwave_state.target_width, g_armwave_state.target_height);
-    fputs("255\n", fp);
-
-    for(yy = 0; yy < g_armwave_state.target_height; yy++) {
-        for(xx = 0; xx < g_armwave_state.target_width; xx++) {
-            data = *(buffer + (xx + (yy * g_armwave_state.target_width)));
-            //printf("xx,yy=%4d,%4d, word=0x%08x\n", xx, yy, data);
-
-            fprintf(fp, "%3d %3d %3d\n", data & 0xff, (data >> 8) & 0xff, (data >> 16) & 0xff);
-        }
-    }
-
-    fclose(fp);
-}
-
-/*
- * Initialise some test functionry.
- */
-void armwave_test_init(int wave_size, int nwaves, int render_width, int render_height)
-{
-}
-
-/*
- * Render image to the local allocated buffer.
- */
-void armwave_test_fill_outbuf()
-{
-    //armwave_fill_pixbuf_scaled(g_armwave_state.out_pixbuf);
-}
-
-/*
  * Dump the working local allocated buffer to a ppm file for debug.
  */
 void armwave_test_dump_buffer_to_ppm(char *fn)
@@ -638,36 +572,6 @@ void armwave_test_buffer_alloc(int nsets)
         return;
     }
 }
-
-/*
- * Fill a pixbuf PyBuffer with a rendered waveform.
- */
-#ifndef NO_PYTHON
-PyObject *armwave_fill_pixbuf_into_pybuffer(PyObject *buf_obj)
-{
-    Py_buffer buffer;
-    int ret;
-
-    //printf("armwave_fill_pixbuf_into_pybuffer: start\n");
-
-    ret = PyObject_GetBuffer(buf_obj, &buffer, PyBUF_SIMPLE | PyBUF_WRITABLE);
-
-    if(ret != 0) {
-        printf("armwave_fill_pixbuf_into_pybuffer: PyObject_GetBuffer() failed, returning PyFalse\n");
-        Py_RETURN_FALSE;
-    }
-
-    //printf("PyObject_GetBuffer did not trigger assert: buffer->buf=0x%08x, buffer->obj=0x%08x, buffer->len=%d\n", buffer->buf, buffer->obj, buffer->len);
-
-    //armwave_fill_pixbuf_scaled(buffer.buf);
-    //printf("armwave_fill_pixbuf_into_pybuffer: buffer fill done\n");
-
-    PyBuffer_Release(&buffer);
-    //printf("armwave_fill_pixbuf_into_pybuffer: done\n");
-
-    Py_RETURN_TRUE;
-}
-#endif
 
 /*
  * Make a test AM waveform for render tests.
@@ -716,50 +620,6 @@ void armwave_test_create_am_sine(float mod, float noise_fraction, int sets)
         set_offset += (g_armwave_state.waves * g_armwave_state.wave_stride);
     }
 }
-
-/*
- * Make a test square waveform.
- *
- * @param   noise_fraction      typically 1e-6
- */
-#if 0
-void armwave_test_create_square(float noise_fraction)
-{
-    uint8_t v;
-    float noise, xnoise;
-    float level = 0.8f, new_level = 0.8f;
-    int w, x;
-
-    for(w = 0; w < g_armwave_state.waves; w++) {
-        for(x = 0; x < g_armwave_state.wave_length; x++) {
-            noise  = ((rand() & 0xffff) * noise_fraction);
-            noise *= noise;
-            noise *= noise;
-            noise *= noise;
-
-            if((rand() & 0xff) > 0x7f)
-                noise = -noise;
-
-            //noise += 1.0f;
-
-            if(x > (g_armwave_state.wave_length * 0.75f)) {
-                new_level = 0.2f;
-            } else if(x > (g_armwave_state.wave_length * 0.5f)) {
-                new_level = 0.8f;
-            } else if(x > (g_armwave_state.wave_length * 0.25f)) {
-                new_level = 0.2f;
-            } else {
-                new_level = 0.8f;
-            }
-
-            level = ((level * 3) + new_level) * 0.25f;
-
-            v = (uint8_t)(CLAMP(level + noise, 0.0f, 1.0f) * 255);
-            g_armwave_state.test_wave_buffer[x + (w * g_armwave_state.wave_stride)] = v;
-        }
-    }
-}
-#endif
 
 /*
  * Free all buffers and set to NULL, ready to be reinitialised or stopped.
