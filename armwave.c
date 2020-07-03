@@ -618,11 +618,14 @@ void armwave_grab_xid(int id)
         XUnmapWindow(g_dpy, g_window);
     }
     
+    printf("Window init\n");
     g_window = id;
     
     XStoreName(g_dpy, g_window, "ArmWave");
     XSetIconName(g_dpy, g_window, "ArmWave");
     XSelectInput(g_dpy, g_window, StructureNotifyMask);
+    
+    printf("Window done, mapping...\n");
     
     XMapWindow(g_dpy, g_window);
     
@@ -630,6 +633,8 @@ void armwave_grab_xid(int id)
         XNextEvent(g_dpy, &event);
     }
     while(event.type != MapNotify || event.xmap.event != g_window);
+    
+    printf("All done in window\n");
 }
 
 /*
