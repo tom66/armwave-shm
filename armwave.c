@@ -60,6 +60,8 @@ XVisualInfo	g_vinfo;
 GC g_gc = NULL;
 XvImage *g_yuv_image = NULL;
 XShmSegmentInfo g_yuv_shminfo;
+XColor g_grat_colour; 
+XSetWindowAttributes g_xswa;
     
 struct MwmHints {
     unsigned long flags;
@@ -399,6 +401,8 @@ void armwave_setup_render(uint32_t start_point, uint32_t end_point, uint32_t wav
 
     printf("s=%d e=%d w=%d ws=%d tw=%d th=%d rf=0x%08x\n", start_point, end_point, waves_max, wave_stride, target_width, target_height, render_flags);
 
+    armwave_set_graticule_colour(127, 127, 127);
+    
     if(start_point > end_point) {
         printf("Error: start point more than end point\n");
         return;
@@ -525,6 +529,18 @@ void armwave_set_channel_colour(int ch, int r, int g, int b, float i)
             g_armwave_state.ch1_color.b = b * i;
             break;
     }
+}
+
+/*
+ * Set the graticule colour.
+ */
+void armwave_set_graticule_colour(int r, int g, int b)
+{
+    g_grat_colour.red = r * 255;
+    g_grat_colour.green = g * 255;
+    g_grat_colour.blue = b * 255;
+    g_grat_colour.flags = DoRed | DoGreen | DoBlue;
+    XAllocColor(g_dpy, g_xswa.colormap, &g_grat_colour);
 }
 
 /*
@@ -755,6 +771,8 @@ void armwave_render_graticule()
     w = g_canvas_dims.w;
     h = g_canvas_dims.h;
     
+    XSetForeground(g_dpy, g_gc, g_grat_colour.pixel);
+    
     if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_FRAME) {
     }
     
@@ -807,7 +825,6 @@ int main()
     int	i, j, ret, p, _d, _w, _h, n;
      	
     Window	window, _dw;
-    XSetWindowAttributes xswa;
     XVisualInfo	vinfo;
     unsigned long mask;
     
@@ -820,8 +837,6 @@ int main()
     clock_t start, end;
     float time_elapsed;
     int stat_rate = 10;
-    
-    XColor grat_colour;
     
     yuv_col.y = 255;
     yuv_col.u = 127;
@@ -849,10 +864,10 @@ int main()
     /*
      * Create the window and map it, then wait for it to send us a map event.
      */
-    xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), g_vinfo.visual, AllocNone);
-    xswa.event_mask = StructureNotifyMask | ExposureMask;
-    xswa.background_pixel = 0;
-    xswa.border_pixel = 0;
+    g_xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), g_vinfo.visual, AllocNone);
+    g_xswa.event_mask = StructureNotifyMask | ExposureMask;
+    g_xswa.background_pixel = 0;
+    g_xswa.border_pixel = 0;
     
     mask = CWBackPixel | CWBorderPixel | CWColormap | CWEventMask;
     
@@ -863,20 +878,12 @@ int main()
 			 0, g_vinfo.depth,
 			 InputOutput,
 			 g_vinfo.visual,
-			 mask, &xswa);
+			 mask, &g_xswa);
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
     
     armwave_grab_xid(window);
     armwave_init_xvimage_shared(tex_width, yuv_height);
-    
-    grat_colour.red = 18000;
-    grat_colour.green = 18000;
-    grat_colour.blue = 18000;
-    grat_colour.flags = DoRed | DoGreen | DoBlue;
-    XAllocColor(g_dpy, xswa.colormap, &grat_colour);
-    
-    XSetForeground(g_dpy, g_gc, grat_colour.pixel);
     
     armwave_render_frame_x11();
     
