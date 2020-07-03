@@ -312,11 +312,6 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
             for(ys = 0; ys < 4; ys++) {
                 scale_value = word & 0xff;
                 
-                // prevents saturating behaviour; we lose two ADC counts.
-                // BUG:  waves 3/4/5 seem to be all zeroes; this kinda ignores them but obviously not a fix, what's going on?
-                if(COND_UNLIKELY(scale_value == 0x00 || scale_value == 0xff))
-                    continue;
-
                 // Keep math in integer where possible.  We compute the X scale and then multiply to get the correct 
                 // base coordinate.  The value of the point then informs us where to write in typically an 8-bit window.
                 // The bonus of this method is that we tend to hit accesses along a 256 byte line.  (512 byte lines if
