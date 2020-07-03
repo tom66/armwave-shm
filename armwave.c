@@ -86,7 +86,8 @@ void hsv2rgb(struct armwave_hsv_t *hsv_in, struct armwave_rgb_t *rgb_out)
     // https://gist.github.com/kuathadianto/200148f53616cbd226d993b400214a7f
     // with modifications
 	float c = hsv_in->s * hsv_in->v;
-	float x = c * (1 - abs(fmod(hsv_in->h / 60.0, 2) - 1));
+    float hprime = fmod(hsv_in->h / 60.0f, 6);
+	float x = c * (1 - abs(fmod(hprime, 2) - 1));
 	float m = hsv_in->v - c;
 	float rs, gs, bs;
 
