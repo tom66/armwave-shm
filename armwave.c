@@ -803,7 +803,7 @@ void armwave_render_frame_x11()
 {
     Window _dw;
     int _d, _w, _h;
-    int m = g_armwave_state.frame_margin;
+    int m = g_armwave_state.frame_margin + 1; 
     
     armwave_set_wave_pointer_as_testbuf(g_frame_num % g_n_test_waves);
     armwave_generate();
