@@ -308,7 +308,7 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
             word = *(uint32_t*)(wave_base + yy); // Read 8 bytes at once
             
             for(ys = 0; ys < 4; ys++) {
-                scale_value = word0 & 0xff;
+                scale_value = word & 0xff;
                 
                 // Keep math in integer where possible.  We compute the X scale and then multiply to get the correct 
                 // base coordinate.  The value of the point then informs us where to write in typically an 8-bit window.
@@ -318,7 +318,7 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
                     ((((yy + ys) * g_armwave_state.cmp_x_bitdepth_scale) >> AM_XCOORD_MULT_SHIFT) * 256 * sizeof(bufftyp_t));
 
                 *(write_buffer + scale_value) += 1;
-                word0 >>= 8;
+                word >>= 8;
             }
         }
     }
