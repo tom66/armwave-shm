@@ -991,6 +991,8 @@ int main()
     armwave_generate();
     armwave_fill_xvimage_scaled(yuv_image);
         
+    XSetForeground(dpy, gc, grat_colour.pixel);
+        
     start = clock();
     
     while (1) {
@@ -1004,8 +1006,6 @@ int main()
         XvShmPutImage(dpy, xv_port, window, gc, yuv_image,
             0, 0, yuv_image->width, yuv_image->height,
             0, 0, _w, _h, True);
-        
-        XSetForeground(dpy, gc, grat_colour.pixel);
         
         for(i = 0; i < (_w / 12.0f); i++) {
             XDrawLine(dpy, window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
