@@ -79,47 +79,48 @@ void rgb2yuv(struct armwave_rgb_t *rgb_in, struct armwave_yuv_t *yuv_out)
 }
 
 /*
- * Helper function to convert HSV to 8-bit RGB.
+ * Helper function to convert 8-bit HSV to 8-bit RGB.
  */
 void hsv2rgb(struct armwave_hsv_t *hsv_in, struct armwave_rgb_t *rgb_out)
 {
-    // https://gist.github.com/kuathadianto/200148f53616cbd226d993b400214a7f
-    // with modifications
-	float c = hsv_in->s * hsv_in->v;
-    float hprime = fmod(hsv_in->h / 60.0f, 6);
-	float x = c * (1 - abs(fmod(hprime, 2) - 1));
-	float m = hsv_in->v - c;
-	float rs, gs, bs;
+    unsigned char region, remainder, p, q, t;
 
-	if(hsv_in->h >= 0 && hsv_in->h < 60) {
-		rs = c;
-		gs = x;
-		bs = 0;	
-	} else if(hsv_in->h >= 60 && hsv_in->h < 120) {	
-		rs = x;
-		gs = c;
-		bs = 0;	
-	} else if(hsv_in->h >= 120 && hsv_in->h < 180) {
-		rs = 0;
-		gs = c;
-		bs = x;	
-	} else if(hsv_in->h >= 180 && hsv_in->h < 240) {
-		rs = 0;
-		gs = x;
-		bs = c;	
-	} else if(hsv_in->h >= 240 && hsv_in->h < 300) {
-		rs = x;
-		gs = 0;
-		bs = c;	
-	} else {
-		rs = c;
-		gs = 0;
-		bs = x;	
-	}
-	
-	rgb_out->r = (rs + m) * 255;
-	rgb_out->g = (gs + m) * 255;
-	rgb_out->b = (bs + m) * 255;
+    if (hsv.s == 0)
+    {
+        rgb_out->r = hsv_in->v;
+        rgb_out->g = hsv_in->v;
+        rgb_out->b = hsv_in->v;
+        return;
+    }
+
+    region = hsv_in->h / 43;
+    remainder = (hsv_in->h - (region * 43)) * 6; 
+
+    p = (hsv_in->v * (255 - hsv_in->s)) >> 8;
+    q = (hsv_in->v * (255 - ((hsv_in->s * remainder) >> 8))) >> 8;
+    t = (hsv_in->v * (255 - ((hsv_in->s * (255 - remainder)) >> 8))) >> 8;
+
+    switch (region)
+    {
+        case 0:
+            rgb_out->r = hsv_in->v; rgb_out->g = t; rgb_out->b = p;
+            break;
+        case 1:
+            rgb_out->r = q; rgb_out->g = hsv_in->v; rgb_out->b = p;
+            break;
+        case 2:
+            rgb_out->r = p; rgb_out->g = hsv_in->v; rgb_out->b = t;
+            break;
+        case 3:
+            rgb_out->r = p; rgb_out->g = q; rgb_out->b = hsv_in->v;
+            break;
+        case 4:
+            rgb_out->r = t; rgb_out->g = p; rgb_out->b = hsv_in->v;
+            break;
+        default:
+            rgb_out->r = hsv_in->v; rgb_out->g = p; rgb_out->b = q;
+            break;
+    }
 }
 
 /*
@@ -202,14 +203,14 @@ void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, s
         
         case PLT_RAINBOW_THERMAL:
             for(v = 0; v < 256; v++) {
-                hsv_temp.h = (360.0f / 255.0f) * v;
-                hsv_temp.s = 0.5f;
-                hsv_temp.v = 0.5f;
+                hsv_temp.h = v;
+                hsv_temp.s = 255;
+                hsv_temp.v = 255;
                 
                 hsv2rgb(&hsv_temp, &rgb_temp);
                 rgb2yuv(&rgb_temp, &yuv_lut[v]); 
                 
-                printf("%3d = [%.2f, %.2f, %.2f] RGB: %3d, %3d, %3d\n", v, hsv_temp.h, hsv_temp.s, hsv_temp.v, rgb_temp.r, rgb_temp.g, rgb_temp.b);
+                printf("%3d = [%3d, %3d, %3d] RGB: %3d, %3d, %3d\n", v, hsv_temp.h, hsv_temp.s, hsv_temp.v, rgb_temp.r, rgb_temp.g, rgb_temp.b);
             }
             break;
     }

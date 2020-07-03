@@ -59,8 +59,8 @@ struct armwave_rgb_t {
 };
 
 struct armwave_hsv_t {
-    // h 0..360, s/v 0..1
-    float h, s, v;
+    // all values 0-255
+    uint8_t h, s, v;
 };
 
 struct armwave_state_t {
