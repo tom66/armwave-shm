@@ -546,14 +546,6 @@ void armwave_set_channel_colour(int ch, int r, int g, int b, float i)
 }
 
 /*
- * Dump the working local allocated buffer to a ppm file for debug.
- */
-void armwave_test_dump_buffer_to_ppm(char *fn)
-{
-    armwave_dump_ppm_debug(g_armwave_state.out_pixbuf, fn);
-}
-
-/*
  * Allocate a test buffer, freeing any existing buffer.
  */
 void armwave_test_buffer_alloc(int nsets)
