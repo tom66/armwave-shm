@@ -729,7 +729,7 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
         printf("yuv_image plane %d offset %d pitch %d\n", n, g_yuv_image->offsets[n], g_yuv_image->pitches[n]);
     }
     
-    if(!XShmAttach(g_dpy, &yuv_shminfo)) {
+    if(!XShmAttach(g_dpy, &g_yuv_shminfo)) {
         printf("Error: Fatal X11: XShmAttached failed\n");
         exit (-1);
     }
