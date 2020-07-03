@@ -54,7 +54,8 @@ const struct armwave_rgb_t fill_black = { 0, 0, 0 };
 Window g_window = 0;
 Display *g_dpy;
 int g_xv_port;
-
+XVisualInfo	g_vinfo;
+    
 struct MwmHints {
     unsigned long flags;
     unsigned long functions;
@@ -635,7 +636,6 @@ void armwave_grab_xid(int id)
 void armwave_init_x11()
 {
     XvAdaptorInfo *ai;
-    XVisualInfo	vinfo;
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
     int	p_num_adaptors, screen, ret;
     
@@ -655,7 +655,7 @@ void armwave_init_x11()
     /*
      * Check the display supports 24-bit TrueColor, if not then abort early.
      */
-    if (XMatchVisualInfo(g_dpy, screen, 24, TrueColor, &vinfo)) {
+    if (XMatchVisualInfo(g_dpy, screen, 24, TrueColor, &g_vinfo)) {
         printf("Found 24bit TrueColor.\n");
     } else {
         printf("Error: Fatal X11: not supported 24-bit TrueColor display.\n");
@@ -779,7 +779,7 @@ int main()
     hint.height = yuv_height;
     hint.flags = PPosition | PSize;
     
-    xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), vinfo.visual, AllocNone);
+    xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), g_vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
     xswa.border_pixel = 0;
@@ -790,9 +790,9 @@ int main()
 			 0, 0,
 			 yuv_width,
 			 yuv_height,
-			 0, vinfo.depth,
+			 0, g_vinfo.depth,
 			 InputOutput,
-			 vinfo.visual,
+			 g_vinfo.visual,
 			 mask, &xswa);
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
