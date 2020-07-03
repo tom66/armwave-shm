@@ -777,7 +777,8 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
  */
 void armwave_render_graticule()
 {
-    int w, h, i, m;
+    int w, h, i, m, p;
+    float gr_size;
     m = g_armwave_state.frame_margin;
     w = g_canvas_dims.w - (m * 2);
     h = g_canvas_dims.h - (m * 2);
@@ -789,12 +790,14 @@ void armwave_render_graticule()
     }
     
     if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_DIVS) {
-        for(i = 0; i < (w / 12.0f); i++) {
-            XDrawLine(g_dpy, g_window, g_gc, (w / 12.0f) * i, m, (w / 12.0f) * i, h);
+        gr_size = (w / 12.0f);
+        for(i = 0, p = m; i < gr_size; i++, p += gr_size) {
+            XDrawLine(g_dpy, g_window, g_gc, p, m, p, h);
         }
         
-        for(i = 0; i < (h / 8.0f); i++) {
-            XDrawLine(g_dpy, g_window, g_gc, m, (h / 8.0f) * i, w, (h / 8.0f) * i);
+        gr_size = (h / 8.0f);
+        for(i = 0; i < gr_size; i++, p += gr_size) {
+            XDrawLine(g_dpy, g_window, g_gc, m, p, w, p);
         }
     }
 }
