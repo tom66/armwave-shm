@@ -101,7 +101,8 @@ struct armwave_state_t {
   int ch_buff_size;
   int size;
   int frame_margin;
-  int n_hdivs, n_vdivs;
+  int n_hdiv, n_vdiv, n_subhdiv, n_subvdiv;
+  float subdiv_frac;
 
   int target_width;
   int target_height;
@@ -143,7 +144,8 @@ void armwave_set_wave_pointer_as_testbuf(int set);
 void armwave_set_wave_pointer_u32(uint32_t wave_buffer_ptr);
 void armwave_set_channel_colour(int ch, int r, int g, int b, float i);
 void armwave_set_graticule_colour(int r, int g, int b);
-void armwave_set_graticule_dims(int marg, int n_hdiv, int n_vdiv);
+void armwave_set_graticule_subcolour(int r, int g, int b);
+void armwave_set_graticule_dims(int marg, int n_hdiv, int n_vdiv, int n_subhdiv, int n_subvdiv, float subdiv_frac);
 void armwave_clear_buffer(uint32_t flags);
 
 void armwave_dump_ppm_debug(uint32_t *buffer, char *fn);
