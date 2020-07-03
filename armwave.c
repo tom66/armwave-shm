@@ -48,7 +48,7 @@ struct armwave_yuv_t yuv_lut[256];
 
 const struct armwave_rgb_t fill_black = { 0, 0, 0 };
 
-Window g_window_id = 0;
+Window g_window = 0;
 Display *g_dpy;
 
 struct MwmHints {
@@ -607,22 +607,22 @@ void armwave_grab_xid(int id)
 {
     XEvent event;
     
-    if(g_window_id != 0) {
-        XUnmapWindow(g_dpy, g_window_id);
+    if(g_window != 0) {
+        XUnmapWindow(g_dpy, g_window);
     }
     
-    g_window_id = id;
+    g_window = id;
     
-    XStoreName(g_dpy, g_window_id, "ArmWave");
-    XSetIconName(g_dpy, g_window_id, "ArmWave");
-    XSelectInput(g_dpy, g_window_id, StructureNotifyMask);
+    XStoreName(g_dpy, g_window, "ArmWave");
+    XSetIconName(g_dpy, g_window, "ArmWave");
+    XSelectInput(g_dpy, g_window, StructureNotifyMask);
     
-    XMapWindow(g_dpy, g_window_id);
+    XMapWindow(g_dpy, g_window);
     
     do {
         XNextEvent(g_dpy, &event);
     }
-    while (event.type != MapNotify || event.xmap.event != g_window_id);
+    while (event.type != MapNotify || event.xmap.event != g_window);
 }
 
 /*
