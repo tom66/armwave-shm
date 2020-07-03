@@ -284,7 +284,7 @@ void armwave_init()
  */
 void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
 {
-    int yy, ys, w, scale_value;
+    int yy, ys, yi, w, scale_value;
     uint32_t value, word;
     uint8_t *wave_base;
     bufftyp_t *write_buffer_base;
@@ -304,18 +304,23 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
 
         // roll through y and render the slice into the out buffer
         // buffer is rendered rotated by 90 degrees
-        for(yy = 0; yy < height; yy += 4) {
+        for(yy = 0, yi = 0; yy < height; yy += 4) {
             word = *(uint32_t*)(wave_base + yy); // Read 4 bytes at once
             
-            for(ys = 0; ys < 4; ys++) {
+            for(ys = 0; ys < 4; ys++, yi++) {
                 scale_value = word & 0xff;
                 
+#ifdef USE_ALU_XCOORD
                 // Keep math in integer where possible.  We compute the X scale and then multiply to get the correct 
                 // base coordinate.  The value of the point then informs us where to write in typically an 8-bit window.
                 // The bonus of this method is that we tend to hit accesses along a 256 byte line.  (512 byte lines if
                 // we set our accumulation buffer to 16 bits.)
                 write_buffer = write_buffer_base + \
                     ((((yy + ys) * g_armwave_state.cmp_x_bitdepth_scale) >> AM_XCOORD_MULT_SHIFT) * 256 * sizeof(bufftyp_t));
+#else
+                write_buffer = write_buffer_base + \
+                    (g_armwave_state.xcoord_to_xpixel[yi] * 256 * sizeof(bufftyp_t));
+#endif
 
                 *(write_buffer + scale_value) += 1;
                 word >>= 8;
