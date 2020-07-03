@@ -37,6 +37,8 @@
 #include <X11/extensions/Xvlib.h>
 #include <X11/extensions/XShm.h>
 
+#include <time.h>
+
 #include "armwave.h"
 
 #define ARMWAVE_VER  "v0.0.1"
@@ -852,6 +854,10 @@ int main()
     int num = 0;
     int n_test_waves = 8;
     
+    clock_t start, end;
+    float time_elapsed;
+    int stat_rate = 10;
+    
     XColor grat_colour;
     
     yuv_col.y = 255;
@@ -1008,6 +1014,8 @@ int main()
     
     printf("%d\n", yuv_image->data_size);
     
+    start = clock();
+    
     while (1) {
         armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
         armwave_generate();
@@ -1047,8 +1055,13 @@ int main()
         
         /* XFlush(dpy); */
          
-        //num++;
-        printf("num=%d\n", num & 0xff);
+        if(num % stat_rate == 0) {
+            end = clock();
+            time_elapsed = (end - start) / CLOCKS_PER_SEC;
+            printf("%d frames took %.2f ms (%.1f fps)\n", stat_rate, time_elapsed * 1000, ((float)stat_rate) / time_elapsed);
+            
+            start = clock();
+        }
             
         //time(&secsb);
         //printf("%ld frames in %ld seconds; %.4f fps\n", frames, secsb-secsa, (double) frames/(secsb-secsa));
