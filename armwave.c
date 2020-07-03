@@ -1019,8 +1019,8 @@ int main()
         
         XSetForeground(dpy, gc, grat_colour.pixel);
         
-        for(i = 0; i < (_w / 12); i++) {
-            XDrawLine(dpy, window, gc, (_w / 12) * i, 0, (_w / 12) * i, _h);
+        for(i = 0; i < (_w / 12.0f); i++) {
+            XDrawLine(dpy, window, gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
         }
         
         /* XFlush(dpy); */
