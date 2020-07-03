@@ -727,7 +727,7 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
         exit (-1);
     }
     
-    printf("%d bytes for XvImage\n", g_yuv_image->data_size);
+    printf("%d bytes for XvImage, shmid %d\n", g_yuv_image->data_size, yuv_shminfo.shmid);
 }
  
 /*
