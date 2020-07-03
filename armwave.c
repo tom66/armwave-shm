@@ -417,6 +417,7 @@ void armwave_setup_render(uint32_t start_point, uint32_t end_point, uint32_t wav
     g_armwave_state.target_width = target_width;
     g_armwave_state.target_height = target_height;
     g_armwave_state.wave_length = end_point - start_point;
+    g_armwave_state.flags = render_flags;
 
     // Calculate compound scaler
     g_armwave_state.cmp_x_bitdepth_scale = \
@@ -754,12 +755,17 @@ void armwave_render_graticule()
     w = g_canvas_dims.w;
     h = g_canvas_dims.h;
     
-    for(i = 0; i < (w / 12.0f); i++) {
-        XDrawLine(g_dpy, g_window, g_gc, (w / 12.0f) * i, 0, (w / 12.0f) * i, h);
+    if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_FRAME) {
     }
     
-    for(i = 0; i < (h / 8.0f); i++) {
-        XDrawLine(g_dpy, g_window, g_gc, 0, (h / 8.0f) * i, w, (h / 8.0f) * i);
+    if(g_armwave_state.flags & AM_FLAG_GRAT_RENDER_DIVS) {
+        for(i = 0; i < (w / 12.0f); i++) {
+            XDrawLine(g_dpy, g_window, g_gc, (w / 12.0f) * i, 0, (w / 12.0f) * i, h);
+        }
+        
+        for(i = 0; i < (h / 8.0f); i++) {
+            XDrawLine(g_dpy, g_window, g_gc, 0, (h / 8.0f) * i, w, (h / 8.0f) * i);
+        }
     }
 }
 
@@ -833,7 +839,8 @@ int main()
      * Set up the renderer.
      */
     printf("Preparing test waveforms...\n");
-    armwave_setup_render(0, tex_width, 1024, tex_width, tex_width, 256, 0);
+    armwave_setup_render(0, tex_width, 1024, tex_width, tex_width, 256, \
+        AM_FLAG_GRAT_RENDER_FRAME | AM_FLAG_GRAT_RENDER_DIVS | AM_FLAG_GRAT_RENDER_XHAIR | AM_FLAG_GRAT_RENDER_SUBDIV);
     armwave_set_channel_colour(1, 255, 178, 25, 10.0f);
     armwave_prep_yuv_palette(PLT_RAINBOW_THERMAL, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.25, 1e-5, g_n_test_waves);

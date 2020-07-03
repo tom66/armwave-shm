@@ -18,6 +18,10 @@
 #define AM_FLAG_DONT_RENDER_CH_3    0x00000040
 #define AM_FLAG_DONT_RENDER_CH_4    0x00000080
 #define AM_FLAG_RENDER_PIX_AA       0x00000100
+#define AM_FLAG_GRAT_RENDER_FRAME   0x00001000
+#define AM_FLAG_GRAT_RENDER_DIVS    0x00002000
+#define AM_FLAG_GRAT_RENDER_XHAIR   0x00004000
+#define AM_FLAG_GRAT_RENDER_SUBDIV  0x00008000
 
 #define AM_XCOORD_MULT_SHIFT        16
 
@@ -102,7 +106,6 @@ struct armwave_state_t {
 
   int row_shift;
   uint32_t row_mask;
-
   uint32_t *out_pixbuf;
 
   struct armwave_color_mix_t ch1_color;
