@@ -308,7 +308,7 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
             word = *(uint32_t*)(wave_base + yy); // Read 4 bytes at once
             
             __builtin_prefetch(wave_base + yy + 128);  // Advise CPU of our next intent
-            __builtin_prefetch(g_armwave_state.xcoord_to_xpixel[yy]);  // Advise CPU of our Xcoord intent
+            __builtin_prefetch(&g_armwave_state.xcoord_to_xpixel[yy]);  // Advise CPU of our Xcoord intent
             
             for(ys = 0; ys < 4; ys++, yi++) {
                 scale_value = word & 0xff;
