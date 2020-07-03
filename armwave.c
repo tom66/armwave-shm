@@ -55,7 +55,7 @@ Window g_window = 0;
 Display *g_dpy;
 int g_xv_port;
 XVisualInfo	g_vinfo;
-GC g_gc;
+GC g_gc = NULL;
     
 struct MwmHints {
     unsigned long flags;
@@ -629,6 +629,12 @@ void armwave_grab_xid(int id)
         XNextEvent(g_dpy, &event);
     }
     while (event.type != MapNotify || event.xmap.event != g_window);
+    
+    // Create the GC
+    if(g_gc != NULL) {
+        XFreeGC(g_gc);
+    }
+    g_gc = XCreateGC(g_dpy, g_window, 0, 0);
 }
 
 /*
@@ -692,9 +698,6 @@ void armwave_init_x11()
         printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
         exit(-1);
     }
-    
-    // Create the GC
-    g_gc = XCreateGC(g_dpy, g_window, 0, 0);
 }
 
 /*
