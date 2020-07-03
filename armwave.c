@@ -626,6 +626,65 @@ void armwave_grab_xid(int id)
 }
 
 /*
+ * Initialise the Xvideo and MITSHM extension.
+ */
+void armwave_init_x11()
+{
+    printf("armwave: initialising for X11...\n");
+        
+    /*
+     * Try to open the display.
+     */
+    g_dpy = XOpenDisplay(NULL);
+    if (g_dpy == NULL) {
+        printf("Error: Fatal X11: Cannot open display.\n");
+        exit (-1);
+    }
+    
+    screen = DefaultScreen(g_dpy);
+    
+    /*
+     * Check the display supports 24-bit TrueColor, if not then abort early.
+     */
+    if (XMatchVisualInfo(g_dpy, screen, 24, TrueColor, &vinfo)) {
+        printf("Found 24bit TrueColor.\n");
+    } else {
+        printf("Error: Fatal X11: not supported 24-bit TrueColor display.\n");
+        exit(-1);
+    }
+        
+    /*
+     * Query the MITSHM extension - check it is available.
+     */
+    if(!XShmQueryExtension(g_dpy)) {
+        printf("Error: Fatal X11: Shared memory extension not available or failed to allocate shared memory.\n");
+        exit(-1);
+    }
+    
+    ret = XvQueryExtension(g_dpy, &p_version, &p_release, &p_request_base,
+			 &p_event_base, &p_error_base);
+    if(ret != Success) {
+        printf("Error: Fatal X11: Unable to find XVideo extension (%d).  Is it configured correctly?\n", ret);
+        exit(-1);
+    }
+    
+    ret = XvQueryAdaptors(g_dpy, DefaultRootWindow(g_dpy),
+			&p_num_adaptors, &ai);
+    
+    if(ret != Success) {
+        printf("Error: Fatal X11: Unable to query XVideo extension (%d).  Is it configured correctly?\n", ret);
+        exit(-1);
+    }
+    
+    // Use the last port available
+    xv_port = ai[p_num_adaptors - 1].base_id;
+    if(xv_port == -1) {
+        printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
+        exit(-1);
+    }
+}
+
+/*
  * Run one rendering tick.
  */
 
@@ -697,17 +756,6 @@ int main()
     printf("Starting up testapp...\n\n");
     
     /*
-     * Try to open the display.
-     */
-    g_dpy = XOpenDisplay(NULL);
-    if (g_dpy == NULL) {
-        printf("Cannot open display.\n");
-        exit (-1);
-    }
-    
-    screen = DefaultScreen(g_dpy);
-    
-    /*
      * Set up the renderer.
      */
     printf("Preparing test waveforms...\n");
@@ -715,20 +763,11 @@ int main()
     armwave_set_channel_colour(1, 255, 178, 25, 10.0f);
     armwave_prep_yuv_palette(PLT_RAINBOW_THERMAL, &g_armwave_state.ch1_color, &g_armwave_state.ch1_color);
     armwave_test_create_am_sine(0.25, 1e-5, n_test_waves);
-    printf("Done, starting XVideo...\n");
+    
+    armwave_init_x11();
     
     /*
-     * Check the display supports 24-bit TrueColor, if not then abort early.
-     */
-    if (XMatchVisualInfo(g_dpy, screen, 24, TrueColor, &vinfo)) {
-        printf("Found 24bit TrueColor.\n");
-    } else {
-        printf("Error: Fatal X11: not supported 24-bit TrueColor display.\n");
-        exit(-1);
-    }
-    
-    /*
-     * Create the window and map it, then wait for it to send us a map event.
+     * Create the window and map it.
      */
     CompletionType = -1;	
     hint.x = 1;
@@ -754,7 +793,6 @@ int main()
 			 mask, &xswa);
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
-    
     armwave_grab_xid(window);
     
     /*
@@ -769,44 +807,6 @@ int main()
             PropModeReplace, (unsigned char *)&hints, 5);
     */
     
-    /*
-     * Query the MITSHM extension - check it is available.
-     */
-    if (XShmQueryExtension(g_dpy)) {
-        shmem_flag = 1;
-    }
-    
-    if (!shmem_flag) {
-        printf("Error: Fatal X11: Shared memory extension not available or failed to allocate shared memory.\n");
-        exit(-1);
-    }
-    
-    if (shmem_flag == 1) {
-        CompletionType = XShmGetEventBase(g_dpy) + ShmCompletion;
-    }
-    
-    ret = XvQueryExtension(g_dpy, &p_version, &p_release, &p_request_base,
-			 &p_event_base, &p_error_base);
-    if (ret != Success) {
-        printf("Error: Fatal X11: Unable to find XVideo extension (%d).  Is it configured correctly?\n", ret);
-        exit(-1);
-    }
-    
-    ret = XvQueryAdaptors(g_dpy, DefaultRootWindow(g_dpy),
-			&p_num_adaptors, &ai);
-    
-    if (ret != Success) {
-        printf("Error: Fatal X11: Unable to query XVideo extension (%d).  Is it configured correctly?\n", ret);
-        exit(-1);
-    }
-    
-    // Use the last port available
-    xv_port = ai[p_num_adaptors - 1].base_id;
-    if(xv_port == -1) {
-        printf("Error: Fatal X11: Unable to use the port %d\n\n", p_num_adaptors - 1);
-        exit(-1);
-    }
-    
     gc = XCreateGC(g_dpy, g_window, 0, 0);
     
     grat_colour.red = 18000;
@@ -819,10 +819,6 @@ int main()
     yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
     yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
     yuv_shminfo.readOnly = False;
-    
-    for(n = 0; n < yuv_image->num_planes; n++) {
-        printf("yuv_image plane %d offset %d pitch %d\n", n, yuv_image->offsets[n], yuv_image->pitches[n]);
-    }
     
     if (!XShmAttach(g_dpy, &yuv_shminfo)) {
         printf("Error: Fatal X11: XShmAttached failed\n", ret);
