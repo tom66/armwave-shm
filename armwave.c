@@ -635,7 +635,7 @@ void armwave_grab_xid(int id)
 void armwave_init_x11()
 {
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
-    int	p_num_adaptors;
+    int	p_num_adaptors, screen;
     
     printf("armwave: initialising for X11...\n");
         
