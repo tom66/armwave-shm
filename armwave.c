@@ -643,9 +643,8 @@ void armwave_grab_xid(int id)
  */
 void armwave_init_x11()
 {
+    int screen;
     XvAdaptorInfo *ai;
-    unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
-    int	p_num_adaptors, screen, ret;
     
     printf("armwave: initialising for X11...\n");
         
@@ -676,6 +675,8 @@ void armwave_init_x11()
  */
 void armwave_init_xvimage_shared(int tex_width, int tex_height)
 {
+    unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
+    int	p_num_adaptors, ret;
     XShmSegmentInfo	yuv_shminfo;
     
     /*
