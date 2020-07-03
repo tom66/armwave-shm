@@ -618,7 +618,6 @@ void armwave_grab_xid(int id)
         XUnmapWindow(g_dpy, g_window);
     }
     
-    printf("Window init\n");
     g_window = id;
     
     XStoreName(g_dpy, g_window, "ArmWave");
@@ -822,6 +821,7 @@ int main()
     /*
      * Try to open the display.
      */
+    /*
     dpy = XOpenDisplay(NULL);
     if (dpy == NULL) {
         printf("Cannot open display.\n");
@@ -829,6 +829,8 @@ int main()
     }
     
     screen = DefaultScreen(dpy);
+    */
+    armwave_init_x11();
     
     /*
      * Set up the renderer.
