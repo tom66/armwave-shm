@@ -634,8 +634,9 @@ void armwave_grab_xid(int id)
  */
 void armwave_init_x11()
 {
+    XvAdaptorInfo *ai;
     unsigned int p_version, p_release, p_request_base, p_event_base, p_error_base;
-    int	p_num_adaptors, screen;
+    int	p_num_adaptors, screen, ret;
     
     printf("armwave: initialising for X11...\n");
         
@@ -711,7 +712,6 @@ int main()
     int	i, j, ret, p, _d, _w, _h, n;
     long secsb, secsa, frames;
     
-    XvAdaptorInfo *ai;
     XvEncodingInfo *ei;
     XvAttribute	*at;
     XvImageFormatValues	*fo;
@@ -818,7 +818,7 @@ int main()
     grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
     
-    yuv_image = XvShmCreateImage(g_dpy, xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
+    yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, yuv_height, &yuv_shminfo);
     yuv_shminfo.shmid = shmget(IPC_PRIVATE, yuv_image->data_size, IPC_CREAT | 0777);
     yuv_shminfo.shmaddr = yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
     yuv_shminfo.readOnly = False;
@@ -847,7 +847,7 @@ int main()
         num += 1;
         XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
-        XvShmPutImage(g_dpy, xv_port, g_window, gc, yuv_image,
+        XvShmPutImage(g_dpy, g_xv_port, g_window, gc, yuv_image,
             0, 0, yuv_image->width, yuv_image->height,
             0, 0, _w, _h, True);
         
