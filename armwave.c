@@ -51,6 +51,7 @@ const struct armwave_rgb_t g_fill_black = { 0, 0, 0 };
 /*
  * X11 properties.  Should these be commoned into one struct?
  */ 
+int g_frame_num, g_n_test_waves;
 Window g_window = 0;
 Display *g_dpy;
 int g_xv_port;
@@ -742,14 +743,25 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
     }
     g_gc = XCreateGC(g_dpy, g_window, 0, 0);
 }
- 
-/*
- * Initialise the graticule
- */
 
 /*
  * Run one rendering tick.
  */
+void armwave_render_frame_x11()
+{
+    Window _dw;
+    int _d, _w, _h;
+    
+    armwave_set_wave_pointer_as_testbuf(g_frame_num % g_n_test_waves);
+    armwave_generate();
+    armwave_fill_xvimage_scaled(g_yuv_image);
+    
+    XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
+    
+    XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
+        0, 0, g_yuv_image->width, g_yuv_image->height,
+        0, 0, _w, _h, True);
+}
 
 /*
  * Main entry point for the testcase.  Based on:
@@ -761,6 +773,7 @@ int main()
     int	yuv_width = 2048;
     int	yuv_height = 256;
     int tex_width = 512;
+    g_n_test_waves = 8;
     
     int	i, j, ret, p, _d, _w, _h, n;
      	
@@ -774,7 +787,6 @@ int main()
     struct armwave_rgb_t grat_rgb_col;
     struct armwave_rgb_t rgb_col;
     int num = 0;
-    int n_test_waves = 8;
     
     clock_t start, end;
     float time_elapsed;
@@ -835,26 +847,18 @@ int main()
     XAllocColor(g_dpy, xswa.colormap, &grat_colour);
     
     // first iter
-    armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
-    armwave_generate();
-    armwave_fill_xvimage_scaled(g_yuv_image);
         
     XSetForeground(g_dpy, g_gc, grat_colour.pixel);
-        
+    
+    armwave_render_frame_x11();
+    
     start = clock();
     
     while (1) {
-        armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
-        armwave_generate();
-        armwave_fill_xvimage_scaled(g_yuv_image);
+        armwave_render_frame_x11();
+        g_frame_num += 1;
         
-        num += 1;
-        XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
-        
-        XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
-            0, 0, g_yuv_image->width, g_yuv_image->height,
-            0, 0, _w, _h, True);
-        
+        /*
         for(i = 0; i < (_w / 12.0f); i++) {
             XDrawLine(g_dpy, g_window, g_gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
         }
@@ -862,10 +866,11 @@ int main()
         for(i = 0; i < (_h / 8.0f); i++) {
             XDrawLine(g_dpy, g_window, g_gc, 0, (_h / 8.0f) * i, _w, (_h / 8.0f) * i);
         }
+        */
         
         /* XFlush(g_dpy); */
          
-        if(num % stat_rate == 0) {
+        if(g_frame_num % stat_rate == 0) {
             end = clock();
             time_elapsed = ((float)(end - start)) / CLOCKS_PER_SEC;
             printf("%d frames (%6d total) took %.2f ms (%.1f fps, %.1f waves/sec)\n", \
