@@ -801,7 +801,10 @@ void armwave_init_xvimage_shared(int tex_width, int tex_height)
     if(g_gc != NULL) {
         XFreeGC(g_dpy, g_gc);
     }
+    
     g_gc = XCreateGC(g_dpy, g_window, 0, 0);
+    g_gc.cap_style = CapNotLast;
+    g_gc.line_width = 1;
 }
 
 /*
