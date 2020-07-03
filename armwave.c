@@ -305,8 +305,8 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
         // roll through y and render the slice into the out buffer
         // buffer is rendered rotated by 90 degrees
         for(yy = 0, yi = 0; yy < height; yy += 4) {
-            word = *(uint32_t*)(wave_base + yy); // Read 4 bytes at once
-            __builtin_prefetch(wave_base + yy + 64);  // Advise CPU of our next intent
+            word = *(uint32_t*)(wave_base + yy);        // Read 4 bytes at once
+            __builtin_prefetch(wave_base + yy + 32);    // Advise CPU of our likely next intent
             
             for(ys = 0; ys < 4; ys++, yi++) {
                 scale_value = word & 0xff;
