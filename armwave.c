@@ -637,27 +637,6 @@ void armwave_grab_xid(int id, int tex_width, int tex_height)
         XFreeGC(g_dpy, g_gc);
     }
     g_gc = XCreateGC(g_dpy, g_window, 0, 0);
-    
-    // Create the shared image
-    printf("Attaching XvShm...\n");
-    
-    if(g_yuv_image != NULL) {
-        // Unsure if this is reasonable
-        XFree(g_yuv_image);
-        g_yuv_image = NULL;
-    }
-    
-    g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
-    yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
-    yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
-    yuv_shminfo.readOnly = False;
-    
-    if(!XShmAttach(g_dpy, &yuv_shminfo)) {
-        printf("Error: Fatal X11: XShmAttached failed\n");
-        exit (-1);
-    }
-    
-    printf("%d bytes for XvImage\n", g_yuv_image->data_size);
 }
 
 /*
@@ -723,6 +702,33 @@ void armwave_init_x11()
     }
 }
 
+/*
+ * Create the shared memory buffer for the XvImage.
+ */
+void armwave_init_xvimage_shared()
+{
+    // Create the shared image
+    printf("Attaching XvShm...\n");
+    
+    if(g_yuv_image != NULL) {
+        // Unsure if this is reasonable
+        XFree(g_yuv_image);
+        g_yuv_image = NULL;
+    }
+    
+    g_yuv_image = XvShmCreateImage(g_dpy, g_xv_port, GUID_YUV12_PLANAR, 0, tex_width, tex_height, &yuv_shminfo);
+    yuv_shminfo.shmid = shmget(IPC_PRIVATE, g_yuv_image->data_size, IPC_CREAT | 0777);
+    yuv_shminfo.shmaddr = g_yuv_image->data = shmat(yuv_shminfo.shmid, 0, 0);
+    yuv_shminfo.readOnly = False;
+    
+    if(!XShmAttach(g_dpy, &yuv_shminfo)) {
+        printf("Error: Fatal X11: XShmAttached failed\n");
+        exit (-1);
+    }
+    
+    printf("%d bytes for XvImage\n", g_yuv_image->data_size);
+}
+ 
 /*
  * Initialise the graticule
  */
@@ -818,6 +824,7 @@ int main()
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
     armwave_grab_xid(window, tex_width, yuv_height);
+    armwave_init_xvimage_shared();
     
     /*
      * Try to strip decoration from window.
@@ -861,11 +868,9 @@ int main()
         
         printf("PutImage...\n");
         
-        /*
         XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
             0, 0, g_yuv_image->width, g_yuv_image->height,
             0, 0, _w, _h, True);
-        */
         
         printf("Done...\n");
         
