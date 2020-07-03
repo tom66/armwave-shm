@@ -996,7 +996,7 @@ int main()
     while (1) {
         armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
         armwave_generate();
-        //armwave_fill_xvimage_scaled(yuv_image);
+        armwave_fill_xvimage_scaled(yuv_image);
         
         num += 1;
         XGetGeometry(dpy, window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
