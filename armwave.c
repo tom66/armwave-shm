@@ -971,7 +971,7 @@ int main()
     grat_colour.red = 32000;
     grat_colour.green = 0;
     grat_colour.blue = 0;
-    xcolour.flags = DoRed | DoGreen | DoBlue;
+    grat_colour.flags = DoRed | DoGreen | DoBlue;
     XAllocColor(dpy, xswa.colormap, &grat_colour);
     
     yuv_image = XvShmCreateImage(dpy, xv_port, GUID_YUV12_PLANAR, 0, yuv_width, yuv_height, &yuv_shminfo);
