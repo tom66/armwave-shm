@@ -994,22 +994,8 @@ int main()
     
     while (1) {
         armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
-        armwave_generate();
-        
-        //frames = secsa = secsb = 0;
-        //time(&secsa);
-        
-        /*
-        for(i = 0; i < 255; i++) {
-            rgb_col.r = i;
-            rgb_col.g = i;
-            rgb_col.b = i;
-            rgb2yuv(&rgb_col, &yuv_col);
-        }
-        
-        exit(-1) ;
-        */
-        
+        //armwave_generate();
+
         armwave_fill_xvimage_scaled(yuv_image);
         
         num += 1;
