@@ -705,7 +705,7 @@ void armwave_init_x11()
 /*
  * Create the shared memory buffer for the XvImage.
  */
-void armwave_init_xvimage_shared()
+void armwave_init_xvimage_shared(int tex_width, int tex_height)
 {
     // Create the shared image
     printf("Attaching XvShm...\n");
@@ -823,8 +823,8 @@ int main()
 			 mask, &xswa);
     
     printf("X11 Window: %d (0x%08x)\n", window, window);
-    armwave_grab_xid(window, tex_width, yuv_height);
-    armwave_init_xvimage_shared();
+    armwave_grab_xid(window);
+    armwave_init_xvimage_shared(tex_width, yuv_height);
     
     /*
      * Try to strip decoration from window.
