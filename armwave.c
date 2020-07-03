@@ -847,7 +847,7 @@ int main()
     start = clock();
     
     while (1) {
-        printf("Iterate...");
+        printf("Iterate...\n");
         
         armwave_set_wave_pointer_as_testbuf(num % n_test_waves);
         armwave_generate();
@@ -855,17 +855,17 @@ int main()
         
         num += 1;
         
-        printf("Geom...");
+        printf("Geom...\n");
         
         XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
         
-        printf("PutImage...");
+        printf("PutImage...\n");
         
         XvShmPutImage(g_dpy, g_xv_port, g_window, g_gc, g_yuv_image,
             0, 0, g_yuv_image->width, g_yuv_image->height,
             0, 0, _w, _h, True);
         
-        printf("Done...");
+        printf("Done...\n");
         
         for(i = 0; i < (_w / 12.0f); i++) {
             XDrawLine(g_dpy, g_window, g_gc, (_w / 12.0f) * i, 0, (_w / 12.0f) * i, _h);
