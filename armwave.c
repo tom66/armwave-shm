@@ -851,9 +851,9 @@ int main()
     hint.height = yuv_height;
     hint.flags = PPosition | PSize;
     
-    printf("A\n");
+    printf("A (dpy=0x%08x)\n", g_dpy);
     
-    xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), vinfo.visual, AllocNone);
+    xswa.colormap = XCreateColormap(g_dpy, DefaultRootWindow(g_dpy), g_vinfo.visual, AllocNone);
     xswa.event_mask = StructureNotifyMask | ExposureMask;
     xswa.background_pixel = 0;
     xswa.border_pixel = 0;
@@ -868,9 +868,9 @@ int main()
 			 0, 0,
 			 yuv_width,
 			 yuv_height,
-			 0, vinfo.depth,
+			 0, g_vinfo.depth,
 			 InputOutput,
-			 vinfo.visual,
+			 g_vinfo.visual,
 			 mask, &xswa);
     
     printf("D\n");
