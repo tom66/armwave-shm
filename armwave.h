@@ -150,6 +150,7 @@ void fill_rgb_xvimage(XvImage *img, struct armwave_rgb_t *rgb);
 void armwave_prep_yuv_palette(int palette, struct armwave_color_mix_t *color0, struct armwave_color_mix_t *color1);
 
 void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height);
+void fill_xvimage_scaled(XvImage *img);
 
 void armwave_init(void);
 void armwave_setup_render(uint32_t start_point, uint32_t end_point, uint32_t waves_max, uint32_t wave_stride, uint32_t target_width, uint32_t target_height, uint32_t render_flags);

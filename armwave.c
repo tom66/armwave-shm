@@ -319,7 +319,7 @@ void render_nonaa_to_buffer_1ch_slice(uint32_t slice_y, uint32_t height)
 /*
  * Render buffer to an XvImage canvas.
  */
-void armwave_fill_xvimage_scaled(XvImage *img)
+void fill_xvimage_scaled(XvImage *img)
 {
     uint32_t xx, yy, ye, y, word, wave_word, painted = 0;
     // uint32_t ysub;
@@ -881,7 +881,7 @@ void armwave_render_frame_x11()
     
     armwave_set_wave_pointer_as_testbuf(g_frame_num % g_n_test_waves);
     armwave_generate();
-    armwave_fill_xvimage_scaled(g_yuv_image);
+    fill_xvimage_scaled(g_yuv_image);
     
     XGetGeometry(g_dpy, g_window, &_dw, &_d, &_d, &_w, &_h, &_d, &_d);
     g_canvas_dims.w = _w;
