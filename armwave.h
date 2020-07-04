@@ -10,6 +10,20 @@
 #include <Python.h>
 #endif
 
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/extensions/XShm.h>
+
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+#include <X11/Xatom.h>
+#include <X11/extensions/Xv.h>
+#include <X11/extensions/Xvlib.h>
+#include <X11/extensions/XShm.h>
+
 #define AM_FLAG_RENDER_1CH_MODE     0x00000001
 #define AM_FLAG_RENDER_2CH_MODE     0x00000002
 #define AM_FLAG_RENDER_4CH_MODE     0x00000004
