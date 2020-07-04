@@ -145,7 +145,7 @@ void hsv2rgb(struct armwave_hsv_t *hsv_in, struct armwave_rgb_t *rgb_out)
 /*
  * Demo/helper function to plot YUV pixel on XvImage canvas.
  */
-void __attribute__((always_inline)) plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
+static void __attribute__((always_inline)) plot_pixel_yuv(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
 {
     int uv_base = img->width * img->height;
     
@@ -158,7 +158,7 @@ void __attribute__((always_inline)) plot_pixel_yuv(XvImage *img, int x, int y, s
  * Demo/helper function to plot YUV pixel on XvImage canvas.  Does not write
  * U/V values if x or y are odd.
  */
-void __attribute__((always_inline)) plot_pixel_yuv_fastq(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
+static void __attribute__((always_inline)) plot_pixel_yuv_fastq(XvImage *img, int x, int y, struct armwave_yuv_t *yuv_in)
 {
     int uv_base = img->width * img->height;
     
