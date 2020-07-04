@@ -125,7 +125,7 @@
   41:armwave.c     **** 
   42:armwave.c     **** #include "armwave.h"
   43:armwave.c     **** 
-  44:armwave.c     **** #define ARMWAVE_VER  "v0.0.1"
+  44:armwave.c     **** #define ARMWAVE_VER  "v0.2.0"
   45:armwave.c     **** 
   46:armwave.c     **** struct armwave_state_t g_armwave_state;
   47:armwave.c     **** struct armwave_yuv_t g_yuv_lut[256];
@@ -7695,8 +7695,8 @@
  5889      20253364 
  5890 005b 00       		.space	1
  5891              	.LC3:
- 5892 005c 76302E30 		.ascii	"v0.0.1\000"
- 5892      2E3100
+ 5892 005c 76302E32 		.ascii	"v0.2.0\000"
+ 5892      2E3000
  5893 0063 00       		.space	1
  5894              	.LC4:
  5895 0064 61726D77 		.ascii	"armwave version: %s\012\000"

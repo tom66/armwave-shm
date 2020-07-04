@@ -5889,7 +5889,7 @@ g_gc:
 	.ascii	"%3d = (%3d, %3d, %3d)\012\000"
 	.space	1
 .LC3:
-	.ascii	"v0.0.1\000"
+	.ascii	"v0.2.0\000"
 	.space	1
 .LC4:
 	.ascii	"armwave version: %s\012\000"
